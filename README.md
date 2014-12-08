@@ -1,0 +1,4 @@
+Fasto
+=====
+
+Oversætter til Fasto
