@@ -82,15 +82,20 @@ fun invalidOperands tps e0 e1 pos =
     1. binary operators +, -, etc.
     3. relational operator <,> *)
 
+fun evalopNum ( oop, IntVal n1, pos ) =
+  IntVal (oop(n1))
+| evalopNum ( oop, e1, pos ) =
+  invalidOperand Int e1 pos
+
+fun evalopBool ( oop, BoolVal n1, pos ) =
+  BoolVal (oop(n1))
+| evalopBool ( oop, e1, pos ) =
+  invalidOperand Bool e1 pos
+
 fun evalBinopNum ( bop, IntVal n1, IntVal n2, pos ) =
     IntVal (bop(n1,n2))
   | evalBinopNum ( bop, e1, e2, pos ) =
     invalidOperands [(Int, Int)] e1 e2 pos
-
-fun evalBinopBool ( bop, BoolVal n1, BoolVal n2, pos ) =
-    BoolVal (bop(n1,n2))
-  | evalBinopBool ( bop, e1, e2, pos ) =
-    invalidOperands [(Bool, Bool)] e1 e2 pos
 
 fun evalEq ( IntVal n1,     IntVal n2,     pos ) =
     BoolVal (n1=n2)
@@ -186,9 +191,6 @@ fun evalExp ( Constant (v,_), vtab, ftab ) = v
             val res2   = evalExp(e2, vtab, ftab)
         in  evalBinopNum(op -, res1, res2, pos)
         end
-
-   (* TODO TASK 1: add cases for Times, Divide, Negate, Not, And, Or.  Look at
-      how Plus and Minus are implemented for inspiration. *)
 	    
   | evalExp ( Times(e1, e2, pos), vtab, ftab ) =
         let val res1   = evalExp(e1, vtab, ftab)
@@ -196,36 +198,37 @@ fun evalExp ( Constant (v,_), vtab, ftab ) = v
         in  evalBinopNum(op *, res1, res2, pos)
         end
 
-  (*
   | evalExp ( Divide(e1, e2, pos), vtab, ftab ) =
         let val res1   = evalExp(e1, vtab, ftab)
             val res2   = evalExp(e2, vtab, ftab)
-        in  evalBinopNum(op /, res1, res2, pos)
+        in  evalBinopNum(op Int.quot, res1, res2, pos)
         end
 
   | evalExp ( Negate(e1, pos), vtab, ftab ) =
         let val res1   = evalExp(e1, vtab, ftab)
-        in  evalBinopNum(op ~, res1, res2, pos)
+        in  evalopNum(op ~, res1, pos)
         end
     
   | evalExp ( Not(e1, pos), vtab, ftab ) =
         let val res1   = evalExp(e1, vtab, ftab)
-            val res2   = evalExp(e2, vtab, ftab)
-        in  evalBinopNum(op not, res1, res2, pos)
+        in  evalopBool(op not, res1, pos)
         end
-    
+
   | evalExp ( And(e1, e2, pos), vtab, ftab ) =
-        let val res1   = evalExp(e1, vtab, ftab)
-            val res2   = evalExp(e2, vtab, ftab)
-        in  evalBinopBool(op &&, res1, res2, pos)
+        let val cond   = evalExp(e1, vtab, ftab)
+        in case cond of
+              BoolVal true  => evalExp(e2, vtab, ftab)
+            | BoolVal false => BoolVal  false
+            | other         => raise Error("And expression not surrounded by booleans", pos)
         end
 
   | evalExp ( Or(e1, e2, pos), vtab, ftab ) =
-        let val res1   = evalExp(e1, vtab, ftab)
-            val res2   = evalExp(e2, vtab, ftab)
-        in  evalBinopBool(op ||, res1, res2, pos)
+        let val cond   = evalExp(e1, vtab, ftab)
+        in case cond of
+              BoolVal true  => BoolVal true
+            | BoolVal false => evalExp(e2, vtab, ftab)
+            | other         => raise Error("Or expression not surrounded by booleans", pos)
         end
-  *)
 
   | evalExp ( Equal(e1, e2, pos), vtab, ftab ) =
         let val r1 = evalExp(e1, vtab, ftab)
@@ -503,12 +506,6 @@ and evalFunArg (FunName fid, vtab, ftab, callpos) =
 	
   | evalFunArg (Lambda (rettype, params, body, fpos), vtab, ftab, callpos) =
     (fn aargs => callFunWithVtable(FunDec("unnamed", rettype, params, body, fpos), aargs, vtab, ftab, callpos), rettype)
-   (* TODO TASK 3:
-
-   Add case for Lambda.  This can be done by constructing an
-   appropriate FunDec from the lambda and passing it to
-   callFunWithVtable.
-    *)
 
 (* Interpreter for Fasto programs:
     1. builds the function symbol table,

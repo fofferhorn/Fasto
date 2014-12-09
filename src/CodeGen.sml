@@ -168,6 +168,12 @@ structure CodeGen = struct
           , Mips.ORI (place, place, makeConst (n mod 65536)) ]
     | Constant (CharVal c, pos) => [ Mips.LI (place, makeConst (ord c)) ]
 
+    |  Constant (BoolVal b, pos) => 
+          if b = true then
+            [ Mips.LI (place, makeConst 1)] 
+          else 
+            [ Mips.LI (place, makeConst 0)]
+
     (* Create/return a label here, collect all string literals of the program
        (in stringTable), and create them in the data section before the heap
        (Mips.ASCIIZ) *)
@@ -219,6 +225,7 @@ structure CodeGen = struct
              NONE          => raise Error ("Name " ^ vname ^ " not found", pos)
            | SOME reg_name => [Mips.MOVE (place, reg_name)]
         )
+
     | Plus (e1, e2, pos) =>
         let val t1 = newName "plus_L"
             val t2 = newName "plus_R"
@@ -232,6 +239,62 @@ structure CodeGen = struct
             val code1 = compileExp e1 vtable t1
             val code2 = compileExp e2 vtable t2
         in  code1 @ code2 @ [Mips.SUB (place,t1,t2)]
+        end
+    | Times (e1, e2, pos) =>
+        let val t1 = newName "times_L"
+            val t2 = newName "times_R"
+            val code1 = compileExp e1 vtable t1
+            val code2 = compileExp e2 vtable t2
+        in code1 @ code2 @ [Mips.MUL (place,t1,t2)]
+        end
+    | Divide (e1, e2, pos) =>
+        let val t1 = newName "divide_L"
+            val t2 = newName "divide_R"
+            val code1 = compileExp e1 vtable t1
+            val code2 = compileExp e2 vtable t2
+        in code1 @ code2 @ [Mips.DIV (place,t1,t2)]
+        end
+    | Negate (e1, pos) =>
+        let val t = newName "negate"
+            val code = compileExp e1 vtable t
+        in code @ [Mips.SUB (place, "0", t)]
+        end
+    | Not (e1, pos) =>
+        let val t = newName "not"
+            val one = newName "one"
+            val not_label = newName "label"
+            val code = compileExp e1 vtable t
+        in code @ [Mips.ADDI (one, "0", "1") , Mips.MOVE (place, one)]
+           @ [Mips.BEQ (t, "0", not_label), Mips.MOVE (place, "0")]
+           @ [Mips.LABEL not_label]
+        end
+    | And (e1, e2, pos) =>
+        let val t1 = newName "and_L"
+            val t2 = newName "and_R"
+            val one = newName "one"
+            val endLabel = newName "endLabel"
+            val falseLabel = newName "falseLabel"
+            val code1 = compileExp e1 vtable t1
+            val code2 = compileExp e2 vtable t2
+        in code1 @ [Mips.BEQ (t1, "0", falseLabel)]
+           @ code2 @ [Mips.BEQ (t2, "0", falseLabel)]
+           @ [Mips.ADDI (one, "0", "1") , Mips.MOVE (place, one) , MIPS.J endLabel]
+           @ [Mips.LABEL falseLabel , Mips.MOVE (place, "0")]
+           @ [Mips.LABEL endLabel]
+        end
+    | Or (e1, e2, pos) =>
+        let val t1 = newName "or_L"
+            val t2 = newName "or_R"
+            val one = newName "one"
+            val endLabel = newName "endLabel"
+            val trueLabel = newName "trueLabel"
+            val code1 = compileExp e1 vtable t1
+            val code2 = compileExp e2 vtable t2
+        in code1 @ [Mips.ADDI (one, "0", "1") , Mips.BEQ (t1, one, trueLabel)]
+           @ code2 @ [Mips.BEQ (t2, one, trueLabel)]
+           @ [Mips.MOVE (place, "0") , MIPS.J endLabel]
+           @ [Mips.LABEL trueLabel , Mips.MOVE (place, one)]
+           @ [Mips.LABEL endLabel]
         end
     | Let (dec, e1, (line, col)) =>
         let val (code1, vtable1) = compileDec dec vtable
@@ -609,20 +672,65 @@ structure CodeGen = struct
            , Mips.LABEL loop_end ]
         end
 
-  (* TODO TASK 1: add case for constant booleans (True/False). *)
-
-  (* TODO TASK 1: add cases for Times, Divide, Negate, Not, And, Or.  Look at
-  how Plus and Minus are implemented for inspiration.  Remember that
-  And and Or are short-circuiting - look at If to see how that could
-  be handled (or your textbook).
-   *)
-
-  (* TODO: TASK 2: Add case for Scan.
+    (* TODO: TASK 2: Add case for Scan.
 
      This can be implemented as sort of a mix between map and reduce.  Start
      by allocating an array of the same size as the input array, then fill it
      by iterating through the input array, calling the given function with the
      accumulator and the current element. *)
+
+    | Scan (farg, arr_exp, elem_type, ret_type, pos) =>
+        let val size_reg = newName "size_reg" (* size of input/output array *)
+            val arr_reg  = newName "arr_reg" (* address of array *)
+            val elem_reg = newName "elem_reg" (* address of single element *)
+            val res_reg = newName "res_reg"
+            val arr_code = compileExp arr_exp vtable arr_reg
+
+            val get_size = [ Mips.LW (size_reg, arr_reg, "0") ]
+
+            val addr_reg = newName "addr_reg" (* address of element in new array *)
+            val i_reg = newName "i_reg"
+            val init_regs = [ Mips.ADDI (addr_reg, place, "4")
+                            , Mips.MOVE (i_reg, "0")
+                            , Mips.ADDI (elem_reg, arr_reg, "4") ]
+
+            val loop_beg = newName "loop_beg"
+            val loop_end = newName "loop_end"
+            val tmp_reg  = newName "tmp_reg"
+            val loop_header = [ Mips.LABEL (loop_beg)
+                              , Mips.SUB (tmp_reg, i_reg, size_reg)
+                              , Mips.BGEZ (tmp_reg, loop_end) ]
+
+            (* map is 'arr[i] = f(old_arr[i])'. *)
+            val loop_scan0 =
+                case getElemSize elem_type of
+                    One => Mips.LB(res_reg, elem_reg, "0")
+                           :: applyFunArg(farg, [res_reg], vtable, res_reg, pos)
+                           @ [ Mips.ADDI(elem_reg, elem_reg, "1") ]
+                  | Four => Mips.LW(res_reg, elem_reg, "0")
+                            :: applyFunArg(farg, [res_reg], vtable, res_reg, pos)
+                            @ [ Mips.ADDI(elem_reg, elem_reg, "4") ]
+            val loop_scan1 =
+                case getElemSize ret_type of
+                    One => [ Mips.SB (res_reg, addr_reg, "0") ]
+                  | Four => [ Mips.SW (res_reg, addr_reg, "0") ]
+
+            val loop_footer =
+                [ Mips.ADDI (addr_reg, addr_reg,
+                             makeConst (elemSizeToInt (getElemSize ret_type)))
+                , Mips.ADDI (i_reg, i_reg, "1")
+                , Mips.J loop_beg
+                , Mips.LABEL loop_end
+                ]
+        in arr_code
+           @ get_size
+           @ dynalloc (size_reg, place, ret_type)
+           @ init_regs
+           @ loop_header
+           @ loop_scan0
+           @ loop_scan1
+           @ loop_footer
+        end
 
   (* TODO: TASK 2: Add case for Filter.
 
