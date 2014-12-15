@@ -235,7 +235,7 @@ and checkExp ftab vtab (exp : In.Exp)
              val elem_type =
                case arr_type of
                    Array t => t
-                 | other   => raise Error ("Map: Argument not an array", pos)
+                 | other   => raise Error ("Map: Argument not an array ", pos)
              val (f', f_res_type, f_arg_type) =
                case checkFunArg (f, vtab, ftab, pos) of
                    (f', res, [a1]) => (f', res, a1)
@@ -245,15 +245,14 @@ and checkExp ftab vtab (exp : In.Exp)
          in if elem_type = f_arg_type
             then (Array f_res_type,
                   Out.Map (f', arr_exp_dec, elem_type, f_res_type, pos))
-            else raise Error ("Map: array element types does not match."
+            else raise Error ("Map: array element types does not match. "
                               ^ ppType elem_type ^ " instead of "
                               ^ ppType f_arg_type , pos)
          end
 
   (* TODO: TASK 2: Add case for Filter.  Quite similar to map, except that the
      return type is the same as the input array type, and the function must
-     return bool.  
-     Tjek lige om det er rigtigt! 
+     return bool.
      *)
 
     | In.Filter (f, arr_exp, _, pos)
@@ -274,7 +273,7 @@ and checkExp ftab vtab (exp : In.Exp)
          in if elem_type = f_arg_type
             then (Array f_res_type,
                   Out.Filter (f', arr_exp_dec, elem_type, pos))
-            else raise Error ("Filter: array element types does not match."
+            else raise Error ("Filter: array element types does not match. "
                               ^ ppType elem_type ^ " instead of "
                               ^ ppType f_arg_type , pos)
          end
