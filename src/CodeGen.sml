@@ -675,9 +675,9 @@ structure CodeGen = struct
         let val arr_reg  = newName "arr_reg"   (* address of input array *)
             val size_reg = newName "size_reg"  (* size of input/output array *)
             val i_reg    = newName "i_reg"     (* loop counter *)
-            val j_reg    = newName "j_reg"     (* address of element in output array *)
             val tmp_reg  = newName "tmp_reg"   (* several purposes *)
             val res_reg  = newName "res_reg"   (* result register of function calls *)
+            val addr_reg = newName "addr_reg"
 
             val loop_beg = newName "loop_beg"
             val loop_end = newName "loop_end"
@@ -685,21 +685,21 @@ structure CodeGen = struct
             val arr_code = compileExp arr_exp vtable arr_reg
 
             val get_size = [ Mips.LW (size_reg, arr_reg, "0") ] (* Gets the size of the input array *)
-          
-            val alloc_space = dynalloc(size_reg, place, tp)
+
+            val alloc_space = [ Mips.ADDI (size_reg, size_reg, "1") ]
+                              @ dynalloc(size_reg, place, tp)
 
             (* Compile initial value into 0[place] (will be updated below) *)
             val acc_code = compileExp acc_exp vtable res_reg 
 
             val save_init = case getElemSize tp of
-                              One  => [ Mips.MOVE (j_reg, "0")
-                                      , Mips.SB (res_reg, place, j_reg) 
-                                      , Mips.ADDI (j_reg, j_reg, "1")]
-                            | Four => [ Mips.MOVE (j_reg, "0")
-                                      , Mips.SW (res_reg, place, j_reg) 
-                                      , Mips.ADDI (j_reg, j_reg, "4")]
+                              One  => [ Mips.SB (res_reg, place, "1")
+                                      , Mips.ADDI (addr_reg, place, "1")
+                                      , Mips.ADDI (arr_reg, arr_reg, "1")]
+                            | Four => [ Mips.SW (res_reg, place, "4")
+                                      , Mips.ADDI (addr_reg, place, "4")
+                                      , Mips.ADDI (arr_reg, arr_reg, "4")]
 
-            (* Set j_reg to address of first element in old array. *)
             (* Set i_reg to 0. While i < size_reg, loop. *)
             val loop_code =
                 [ Mips.MOVE (i_reg, "0")
@@ -712,28 +712,20 @@ structure CodeGen = struct
                 case getElemSize tp of
                     One =>  Mips.LB   (tmp_reg, arr_reg, "0")
                             :: applyFunArg(binop, [res_reg, tmp_reg], vtable, res_reg, pos)
-                            @ [ Mips.ADDI (j_reg, j_reg, "1") ]
+                            @ [ Mips.ADDI (arr_reg, arr_reg, "1") ]
+                            @ [ Mips.ADDI (addr_reg, addr_reg, "1") ]
                   | Four => Mips.LW   (tmp_reg, arr_reg, "0")
                             :: applyFunArg(binop, [res_reg, tmp_reg], vtable, res_reg, pos)
-                            @ [ Mips.ADDI (j_reg, j_reg, "4") ]
+                            @ [ Mips.ADDI (arr_reg, arr_reg, "4") ]
+                            @ [ Mips.ADDI (addr_reg, addr_reg, "4") ]
 
             val save_to_arr =
                 case getElemSize tp of
-                              One  => [ Mips.SB(res_reg, place, j_reg) ]
-                            | Four => [ Mips.SW(res_reg, place, j_reg) ]
+                              One  => [ Mips.SB(res_reg, addr_reg, "0") ]
+                            | Four => [ Mips.SW(res_reg, addr_reg, "0") ]
 
             val loop_footer =
-                [ Mips.ADDI (j_reg, j_reg,
-                             makeConst (elemSizeToInt (getElemSize tp)))
-                , Mips.ADDI (i_reg, i_reg, "1")
-                , Mips.J loop_beg
-                , Mips.LABEL loop_end
-                ]
-
-            val loop_footer =
-                [ Mips.ADDI (addr_reg, addr_reg,
-                             makeConst (elemSizeToInt (getElemSize ret_type)))
-                , Mips.ADDI (i_reg, i_reg, "1")
+                [ Mips.ADDI (i_reg, i_reg, "1")
                 , Mips.J loop_beg
                 , Mips.LABEL loop_end
                 ]
@@ -772,6 +764,7 @@ structure CodeGen = struct
             val alloc_space = dynalloc(size_reg, place, elem_type)
 
             val i_reg    = newName "i_reg"    (* the invariant i *)
+            val j_reg = newName "j_reg"
             val addr_reg = newName "addr_reg" (* address of element in new array *)
 
             val init_regs = [ Mips.ADDI (addr_reg, place, "4")
@@ -805,16 +798,18 @@ structure CodeGen = struct
                     One  => [ Mips.SB (arr_val, addr_reg, "0") ]
                   | Four => [ Mips.SW (arr_val, addr_reg, "0") ]
 
-
             val loop_footer =
                 [ Mips.ADDI (addr_reg, addr_reg,
                              makeConst (elemSizeToInt (getElemSize elem_type)))
+                , Mips.ADDI (j_reg, j_reg, "1")
                 , Mips.J loop_beg
                 , Mips.LABEL loop_end
+                , Mips.SW (j_reg, place, "0")
                 ]
 
         in
-          get_size
+          arr_code
+          @ get_size
           @ alloc_space
           @ init_regs
           @ loop_header
