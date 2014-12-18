@@ -260,12 +260,11 @@ structure CodeGen = struct
         in code @ [Mips.SUB (place, "0", t)]
         end
     | Not (e1, pos) =>
-        let val t = newName "not"
-            val one = newName "one"
+        let val not_ = newName "not_"
             val not_label = newName "label"
-            val code = compileExp e1 vtable t
-        in code @ [Mips.ADDI (one, "0", "1") , Mips.MOVE (place, one)]
-           @ [Mips.BEQ (t, "0", not_label), Mips.MOVE (place, "0")]
+            val code = compileExp e1 vtable not_
+        in code @ [Mips.LI (place, makeConst 1)]
+           @ [Mips.BEQ (not_, "0", not_label), Mips.MOVE (place, "0")]
            @ [Mips.LABEL not_label]
         end
     | And (e1, e2, pos) =>
@@ -661,16 +660,6 @@ structure CodeGen = struct
            , Mips.LABEL loop_end ]
         end
 
-    (* TODO: TASK 2: Add case for Scan.
-
-     This can be implemented as sort of a mix between map and reduce.  Start
-     by allocating an array of the same size as the input array, then fill it
-     by iterating through the input array, calling the given function with the
-     accumulator and the current element. *)
-
-    (* SPØRGSMÅL: Hvorfor får vi typefejl her? Den tror scan returnerer en int,
-     men den skal returnere en [int]. Dette sker når testen scan.fo køres. *)
-
     | Scan (binop, acc_exp, arr_exp, tp, pos) =>
         let val arr_reg  = newName "arr_reg"   (* address of input array *)
             val size_reg = newName "size_reg"  (* size of input/output array *)
@@ -740,17 +729,6 @@ structure CodeGen = struct
            @ save_to_arr
            @ loop_footer
         end
- 
-  (* TODO: TASK 2: Add case for Filter.
-
-     Start by allocating an array of the same size as the input array.  Then,
-     for each element in the input array, if the predicate function is true
-     copy it to the result array.  Finally, fix the length-field at the end,
-     once you know how many elements that are actually left.  Do not worry
-     about wasted space. *)
-
-  (* SPØRGSMÅL: Hvorfor får vi typefejl her? Den tror filter returnerer en [bool],
-     men den skal returnere en [int]. Dette sker når testen filter.fo køres. *)
 
     | Filter (farg, arr_exp, elem_type, pos) =>
         let val size_reg = newName "size_reg" (* size of input/output array *)

@@ -374,17 +374,22 @@ and checkExp ftab vtab (exp : In.Exp)
 
 and checkFunArg (In.FunName fname, vtab, ftab, pos) =
     (case SymTab.lookup fname ftab of
-         NONE             => raise Error ("Unknown identifier " ^ fname, pos)
+         NONE                          => raise Error ("Unknown identifier " ^ fname, pos)
        | SOME (ret_type, arg_types, _) => (Out.FunName fname, ret_type, arg_types))
-
+    
+  | checkFunArg (In.Lambda (rettype, params, body, fpos), vtab, ftab, pos) =
+    let val fundec = In.FunDec()
+        val ... = checkFunWithVtable(fundec, vtab, ftab, pos)
+    in
+    Out.Lambda()
+    end
         (* TODO TASK 3:
 
         Add case for In.Lambda.  This can be done by
         constructing an appropriate In.FunDec and passing it to
         checkFunWithVtable, then constructing an Out.Lambda from the
         result. 
-  | checkFunArg (In.Lambda (rettype, params, body, fpos), vtab, ftab, pos)) =
-    checkFunWithVtable(In.FunDec )
+  
     *)
 
 (* Check a function declaration, but using a given vtable rather

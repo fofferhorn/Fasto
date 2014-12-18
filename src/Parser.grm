@@ -7,7 +7,8 @@ open Fasto.UnknownTypes
 
 %}
 
-%token <(int*int)> IF THEN ELSE LET IN INT BOOL CHAR EOF FALSE TRUE
+%token <(int*int)> IF THEN ELSE LET IN INT BOOL CHAR EOF
+%token <bool*(int*int)> BOOLVAL
 %token <string*(int*int)> ID STRINGLIT
 %token <int*(int*int)> NUM
 %token <char*(int*int)> CHARLIT
@@ -72,8 +73,9 @@ BinOp :   PLUS          { (Lambda
                         }
 ;
 
-Exp :     NUM            { Constant (IntVal (#1 $1), #2 $1) }
+Exp :     NUM            { Constant (IntVal  (#1 $1), #2 $1) }
         | CHARLIT        { Constant (CharVal (#1 $1), #2 $1) }
+        | BOOLVAL        { Constant (BoolVal (#1 $1), #2 $1) }
         | ID             { Var $1 }
         | STRINGLIT      { StringLit $1 }
         | LCURLY Exps RCURLY
@@ -84,8 +86,6 @@ Exp :     NUM            { Constant (IntVal (#1 $1), #2 $1) }
 	    | Exp DIVIDE Exp { Divide($1, $3, $2) }
 	    | Exp AND Exp    { And ($1, $3, $2) }
 	    | Exp OR Exp     { Or  ($1, $3, $2) }
-	    | TRUE           { True  ($1) }
-	    | FALSE          { False ($1) }
 	    | NOT Exp        { Not ($2, $1) }
 	    | NEGATE Exp     { Negate ($2, $1)  }
         | Exp DEQ   Exp  { Equal($1, $3, $2) }
