@@ -377,12 +377,7 @@ and checkFunArg (In.FunName fname, vtab, ftab, pos) =
          NONE                          => raise Error ("Unknown identifier " ^ fname, pos)
        | SOME (ret_type, arg_types, _) => (Out.FunName fname, ret_type, arg_types))
     
-  | checkFunArg (In.Lambda (rettype, params, body, fpos), vtab, ftab, pos) =
-    let val fundec = In.FunDec()
-        val ... = checkFunWithVtable(fundec, vtab, ftab, pos)
-    in
-    Out.Lambda()
-    end
+ 
         (* TODO TASK 3:
 
         Add case for In.Lambda.  This can be done by

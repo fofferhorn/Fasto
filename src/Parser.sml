@@ -419,7 +419,7 @@ val yycheck = "\021\000\
 \\034\001\255\255\255\255\255\255\038\001\255\255\255\255\041\001";
 
 val yyact = vector_ 48 (fn () => ((raise Fail "parser") : obj));
-(* Rule 1, file Parser.grm, line 44 *)
+(* Rule 1, file Parser.grm, line 42 *)
 val _ = update_ yyact 1
 (fn () => repr(let
 val d__1__ = peekVal 1 : Fasto.UnknownTypes.FunDec list
@@ -427,7 +427,7 @@ val d__2__ = peekVal 0 : (int*int)
 in
 ( (d__1__) ) end : Fasto.UnknownTypes.Prog))
 ;
-(* Rule 2, file Parser.grm, line 47 *)
+(* Rule 2, file Parser.grm, line 45 *)
 val _ = update_ yyact 2
 (fn () => repr(let
 val d__1__ = peekVal 2 : (int*int)
@@ -436,7 +436,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.FunDec list
 in
 ( (d__2__) :: (d__3__) ) end : Fasto.UnknownTypes.FunDec list))
 ;
-(* Rule 3, file Parser.grm, line 48 *)
+(* Rule 3, file Parser.grm, line 46 *)
 val _ = update_ yyact 3
 (fn () => repr(let
 val d__1__ = peekVal 1 : (int*int)
@@ -444,7 +444,7 @@ val d__2__ = peekVal 0 : Fasto.UnknownTypes.FunDec
 in
 ( (d__2__) :: [] ) end : Fasto.UnknownTypes.FunDec list))
 ;
-(* Rule 4, file Parser.grm, line 52 *)
+(* Rule 4, file Parser.grm, line 50 *)
 val _ = update_ yyact 4
 (fn () => repr(let
 val d__1__ = peekVal 6 : Fasto.Type
@@ -457,7 +457,7 @@ val d__7__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( FunDec (#1 (d__2__), (d__1__), (d__4__), (d__7__), #2 (d__2__)) ) end : Fasto.UnknownTypes.FunDec))
 ;
-(* Rule 5, file Parser.grm, line 54 *)
+(* Rule 5, file Parser.grm, line 52 *)
 val _ = update_ yyact 5
 (fn () => repr(let
 val d__1__ = peekVal 5 : Fasto.Type
@@ -469,28 +469,28 @@ val d__6__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( FunDec (#1 (d__2__), (d__1__), [], (d__6__), #2 (d__2__)) ) end : Fasto.UnknownTypes.FunDec))
 ;
-(* Rule 6, file Parser.grm, line 57 *)
+(* Rule 6, file Parser.grm, line 55 *)
 val _ = update_ yyact 6
 (fn () => repr(let
 val d__1__ = peekVal 0 : (int*int)
 in
 ( Int ) end : Fasto.Type))
 ;
-(* Rule 7, file Parser.grm, line 58 *)
+(* Rule 7, file Parser.grm, line 56 *)
 val _ = update_ yyact 7
 (fn () => repr(let
 val d__1__ = peekVal 0 : (int*int)
 in
 ( Bool ) end : Fasto.Type))
 ;
-(* Rule 8, file Parser.grm, line 59 *)
+(* Rule 8, file Parser.grm, line 57 *)
 val _ = update_ yyact 8
 (fn () => repr(let
 val d__1__ = peekVal 0 : (int*int)
 in
 ( Char ) end : Fasto.Type))
 ;
-(* Rule 9, file Parser.grm, line 60 *)
+(* Rule 9, file Parser.grm, line 58 *)
 val _ = update_ yyact 9
 (fn () => repr(let
 val d__1__ = peekVal 2 : (int*int)
@@ -499,7 +499,7 @@ val d__3__ = peekVal 0 : (int*int)
 in
 ( Array (d__2__) ) end : Fasto.Type))
 ;
-(* Rule 10, file Parser.grm, line 63 *)
+(* Rule 10, file Parser.grm, line 61 *)
 val _ = update_ yyact 10
 (fn () => repr(let
 val d__1__ = peekVal 3 : Fasto.Type
@@ -509,7 +509,7 @@ val d__4__ = peekVal 0 : Fasto.Param list
 in
 ( Param (#1 (d__2__), (d__1__)) :: (d__4__) ) end : Fasto.Param list))
 ;
-(* Rule 11, file Parser.grm, line 64 *)
+(* Rule 11, file Parser.grm, line 62 *)
 val _ = update_ yyact 11
 (fn () => repr(let
 val d__1__ = peekVal 1 : Fasto.Type
@@ -517,7 +517,7 @@ val d__2__ = peekVal 0 : string*(int*int)
 in
 ( Param (#1 (d__2__), (d__1__)) :: [] ) end : Fasto.Param list))
 ;
-(* Rule 12, file Parser.grm, line 67 *)
+(* Rule 12, file Parser.grm, line 65 *)
 val _ = update_ yyact 12
 (fn () => repr(let
 val d__1__ = peekVal 0 : (int*int)
@@ -530,42 +530,42 @@ in
                                         (d__1__)) ,(d__1__)))
                         ) end : Fasto.UnknownTypes.FunArg))
 ;
-(* Rule 13, file Parser.grm, line 76 *)
+(* Rule 13, file Parser.grm, line 74 *)
 val _ = update_ yyact 13
 (fn () => repr(let
 val d__1__ = peekVal 0 : int*(int*int)
 in
 ( Constant (IntVal  (#1 (d__1__)), #2 (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 14, file Parser.grm, line 77 *)
+(* Rule 14, file Parser.grm, line 75 *)
 val _ = update_ yyact 14
 (fn () => repr(let
 val d__1__ = peekVal 0 : char*(int*int)
 in
 ( Constant (CharVal (#1 (d__1__)), #2 (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 15, file Parser.grm, line 78 *)
+(* Rule 15, file Parser.grm, line 76 *)
 val _ = update_ yyact 15
 (fn () => repr(let
 val d__1__ = peekVal 0 : bool*(int*int)
 in
 ( Constant (BoolVal (#1 (d__1__)), #2 (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 16, file Parser.grm, line 79 *)
+(* Rule 16, file Parser.grm, line 77 *)
 val _ = update_ yyact 16
 (fn () => repr(let
 val d__1__ = peekVal 0 : string*(int*int)
 in
 ( Var (d__1__) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 17, file Parser.grm, line 80 *)
+(* Rule 17, file Parser.grm, line 78 *)
 val _ = update_ yyact 17
 (fn () => repr(let
 val d__1__ = peekVal 0 : string*(int*int)
 in
 ( StringLit (d__1__) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 18, file Parser.grm, line 82 *)
+(* Rule 18, file Parser.grm, line 80 *)
 val _ = update_ yyact 18
 (fn () => repr(let
 val d__1__ = peekVal 2 : (int*int)
@@ -574,7 +574,7 @@ val d__3__ = peekVal 0 : (int*int)
 in
 ( ArrayLit ((d__2__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 19, file Parser.grm, line 83 *)
+(* Rule 19, file Parser.grm, line 81 *)
 val _ = update_ yyact 19
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -583,7 +583,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Plus ((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 20, file Parser.grm, line 84 *)
+(* Rule 20, file Parser.grm, line 82 *)
 val _ = update_ yyact 20
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -592,7 +592,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Minus((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 21, file Parser.grm, line 85 *)
+(* Rule 21, file Parser.grm, line 83 *)
 val _ = update_ yyact 21
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -601,7 +601,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Times((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 22, file Parser.grm, line 86 *)
+(* Rule 22, file Parser.grm, line 84 *)
 val _ = update_ yyact 22
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -610,7 +610,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Divide((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 23, file Parser.grm, line 87 *)
+(* Rule 23, file Parser.grm, line 85 *)
 val _ = update_ yyact 23
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -619,7 +619,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( And ((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 24, file Parser.grm, line 88 *)
+(* Rule 24, file Parser.grm, line 86 *)
 val _ = update_ yyact 24
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -628,7 +628,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Or  ((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 25, file Parser.grm, line 89 *)
+(* Rule 25, file Parser.grm, line 87 *)
 val _ = update_ yyact 25
 (fn () => repr(let
 val d__1__ = peekVal 1 : (int*int)
@@ -636,7 +636,7 @@ val d__2__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Not ((d__2__), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 26, file Parser.grm, line 90 *)
+(* Rule 26, file Parser.grm, line 88 *)
 val _ = update_ yyact 26
 (fn () => repr(let
 val d__1__ = peekVal 1 : (int*int)
@@ -644,7 +644,7 @@ val d__2__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Negate ((d__2__), (d__1__))  ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 27, file Parser.grm, line 91 *)
+(* Rule 27, file Parser.grm, line 89 *)
 val _ = update_ yyact 27
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -653,7 +653,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Equal((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 28, file Parser.grm, line 92 *)
+(* Rule 28, file Parser.grm, line 90 *)
 val _ = update_ yyact 28
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -662,7 +662,7 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Less ((d__1__), (d__3__), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 29, file Parser.grm, line 94 *)
+(* Rule 29, file Parser.grm, line 92 *)
 val _ = update_ yyact 29
 (fn () => repr(let
 val d__1__ = peekVal 5 : (int*int)
@@ -674,7 +674,7 @@ val d__6__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( If ((d__2__), (d__4__), (d__6__), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 30, file Parser.grm, line 96 *)
+(* Rule 30, file Parser.grm, line 94 *)
 val _ = update_ yyact 30
 (fn () => repr(let
 val d__1__ = peekVal 3 : string*(int*int)
@@ -684,7 +684,7 @@ val d__4__ = peekVal 0 : (int*int)
 in
 ( Apply (#1 (d__1__), (d__3__), #2 (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 31, file Parser.grm, line 98 *)
+(* Rule 31, file Parser.grm, line 96 *)
 val _ = update_ yyact 31
 (fn () => repr(let
 val d__1__ = peekVal 2 : string*(int*int)
@@ -693,7 +693,7 @@ val d__3__ = peekVal 0 : (int*int)
 in
 ( Apply (#1 (d__1__), [], #2 (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 32, file Parser.grm, line 101 *)
+(* Rule 32, file Parser.grm, line 99 *)
 val _ = update_ yyact 32
 (fn () => repr(let
 val d__1__ = peekVal 3 : (int*int)
@@ -703,7 +703,7 @@ val d__4__ = peekVal 0 : (int*int)
 in
 ( Read ((d__3__), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 33, file Parser.grm, line 103 *)
+(* Rule 33, file Parser.grm, line 101 *)
 val _ = update_ yyact 33
 (fn () => repr(let
 val d__1__ = peekVal 3 : (int*int)
@@ -713,7 +713,7 @@ val d__4__ = peekVal 0 : (int*int)
 in
 ( Write ((d__3__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 34, file Parser.grm, line 105 *)
+(* Rule 34, file Parser.grm, line 103 *)
 val _ = update_ yyact 34
 (fn () => repr(let
 val d__1__ = peekVal 3 : (int*int)
@@ -723,7 +723,7 @@ val d__4__ = peekVal 0 : (int*int)
 in
 ( Iota ((d__3__), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 35, file Parser.grm, line 107 *)
+(* Rule 35, file Parser.grm, line 105 *)
 val _ = update_ yyact 35
 (fn () => repr(let
 val d__1__ = peekVal 5 : (int*int)
@@ -735,7 +735,7 @@ val d__6__ = peekVal 0 : (int*int)
 in
 ( Replicate ((d__3__), (d__5__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 36, file Parser.grm, line 109 *)
+(* Rule 36, file Parser.grm, line 107 *)
 val _ = update_ yyact 36
 (fn () => repr(let
 val d__1__ = peekVal 7 : (int*int)
@@ -749,7 +749,7 @@ val d__8__ = peekVal 0 : (int*int)
 in
 ( Reduce ((d__3__), (d__5__), (d__7__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 37, file Parser.grm, line 111 *)
+(* Rule 37, file Parser.grm, line 109 *)
 val _ = update_ yyact 37
 (fn () => repr(let
 val d__1__ = peekVal 5 : (int*int)
@@ -761,7 +761,7 @@ val d__6__ = peekVal 0 : (int*int)
 in
 ( Map ((d__3__), (d__5__), (), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 38, file Parser.grm, line 113 *)
+(* Rule 38, file Parser.grm, line 111 *)
 val _ = update_ yyact 38
 (fn () => repr(let
 val d__1__ = peekVal 8 : (int*int)
@@ -776,7 +776,7 @@ val d__9__ = peekVal 0 : (int*int)
 in
 ( Reduce ((d__4__), (d__6__), (d__8__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 39, file Parser.grm, line 115 *)
+(* Rule 39, file Parser.grm, line 113 *)
 val _ = update_ yyact 39
 (fn () => repr(let
 val d__1__ = peekVal 7 : (int*int)
@@ -790,7 +790,7 @@ val d__8__ = peekVal 0 : (int*int)
 in
 ( Scan ((d__3__), (d__5__), (d__7__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 40, file Parser.grm, line 117 *)
+(* Rule 40, file Parser.grm, line 115 *)
 val _ = update_ yyact 40
 (fn () => repr(let
 val d__1__ = peekVal 5 : (int*int)
@@ -802,7 +802,7 @@ val d__6__ = peekVal 0 : (int*int)
 in
 ( Filter ((d__3__), (d__5__), (), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 41, file Parser.grm, line 118 *)
+(* Rule 41, file Parser.grm, line 116 *)
 val _ = update_ yyact 41
 (fn () => repr(let
 val d__1__ = peekVal 2 : (int*int)
@@ -811,7 +811,7 @@ val d__3__ = peekVal 0 : (int*int)
 in
 ( (d__2__) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 42, file Parser.grm, line 120 *)
+(* Rule 42, file Parser.grm, line 118 *)
 val _ = update_ yyact 42
 (fn () => repr(let
 val d__1__ = peekVal 5 : (int*int)
@@ -823,7 +823,7 @@ val d__6__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( Let (Dec (#1 (d__2__), (d__4__), (d__3__)), (d__6__), (d__1__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 43, file Parser.grm, line 122 *)
+(* Rule 43, file Parser.grm, line 120 *)
 val _ = update_ yyact 43
 (fn () => repr(let
 val d__1__ = peekVal 3 : string*(int*int)
@@ -833,7 +833,7 @@ val d__4__ = peekVal 0 : (int*int)
 in
 ( Index (#1 (d__1__), (d__3__), (), (d__2__)) ) end : Fasto.UnknownTypes.Exp))
 ;
-(* Rule 44, file Parser.grm, line 125 *)
+(* Rule 44, file Parser.grm, line 123 *)
 val _ = update_ yyact 44
 (fn () => repr(let
 val d__1__ = peekVal 2 : Fasto.UnknownTypes.Exp
@@ -842,14 +842,14 @@ val d__3__ = peekVal 0 : Fasto.UnknownTypes.Exp list
 in
 ( (d__1__) :: (d__3__) ) end : Fasto.UnknownTypes.Exp list))
 ;
-(* Rule 45, file Parser.grm, line 126 *)
+(* Rule 45, file Parser.grm, line 124 *)
 val _ = update_ yyact 45
 (fn () => repr(let
 val d__1__ = peekVal 0 : Fasto.UnknownTypes.Exp
 in
 ( (d__1__) :: [] ) end : Fasto.UnknownTypes.Exp list))
 ;
-(* Rule 46, file Parser.grm, line 129 *)
+(* Rule 46, file Parser.grm, line 127 *)
 val _ = update_ yyact 46
 (fn () => repr(let
 val d__1__ = peekVal 0 : string*(int*int)
