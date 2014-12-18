@@ -252,7 +252,8 @@ structure CodeGen = struct
             val t2 = newName "divide_R"
             val code1 = compileExp e1 vtable t1
             val code2 = compileExp e2 vtable t2
-        in code1 @ code2 @ [Mips.DIV (place,t1,t2)]
+        in 
+code1 @ code2 @ [Mips.DIV (place,t1,t2)]
         end
     | Negate (e1, pos) =>
         let val t = newName "negate"
@@ -803,8 +804,22 @@ structure CodeGen = struct
    expression using map and filter, then run compileExp on that. *)
 
   and applyFunArg (FunName s, args, vtable, place, pos) : Mips.Prog =
-      let val tmp_reg = newName "tmp_reg"
-      in  applyRegs(s, args, tmp_reg, pos) @ [Mips.MOVE(place, tmp_reg)] end
+      let 
+        val tmp_reg = newName "tmp_reg"
+      in  
+        applyRegs(s, args, tmp_reg, pos) @ [Mips.MOVE(place, tmp_reg)] 
+      end
+      (*
+    | applyFunArg (Lambda (rettype, params, body, fpos), args, vtable, place, pos) : Mips.Prog =
+      let
+        val tmp_reg = newName "tmp_reg"
+        val compiled_body = compileExp body vtable tmp_reg
+        val param_list = map (fn Param (p, tp) => p) params
+      in
+          compiled_body 
+        @ applyRegs(Lambda (rettype, params, body, fpos), args, tmp_reg, pos) 
+        @ [Mips.MOVE(place, tmp_reg)] 
+      end *)
      (* TODO TASK 3:
         Add case for Lambda.  This is very similar to how function
         definitions work.  You need to bind the parameters of the

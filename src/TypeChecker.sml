@@ -250,10 +250,6 @@ and checkExp ftab vtab (exp : In.Exp)
                               ^ ppType f_arg_type , pos)
          end
 
-  (* TODO: TASK 2: Add case for Filter.  Quite similar to map, except that the
-     return type is the same as the input array type, and the function must
-     return bool.
-     *)
     | In.Map (f, arr_exp, _, _, pos)
       => let val (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
              val elem_type =
@@ -273,6 +269,11 @@ and checkExp ftab vtab (exp : In.Exp)
                               ^ ppType elem_type ^ " instead of "
                               ^ ppType f_arg_type , pos)
          end
+
+  (* TODO: TASK 2: Add case for Filter.  Quite similar to map, except that the
+     return type is the same as the input array type, and the function must
+     return bool.
+     *)
 
     | In.Filter (f, arr_exp, _, pos)
       => let val (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
@@ -378,10 +379,13 @@ and checkFunArg (In.FunName fname, vtab, ftab, pos) =
        | SOME (ret_type, arg_types, _) => (Out.FunName fname, ret_type, arg_types))
     
   | checkFunArg (In.Lambda (rettype, params, body, fpos), vtab, ftab, pos) =
-    let val fundec = In.FunDec()
-        val ... = checkFunWithVtable(fundec, vtab, ftab, pos)
+    let 
+      val fundec = In.FunDec("unnamed", rettype, params, body, fpos)
+      val checkFun = checkFunWithVtable(fundec, vtab, ftab, pos)
+      val (tp, exp) = checkExp ftab vtab body
     in
-    Out.Lambda()
+      case checkFun of
+        _ => (Out.Lambda (rettype, params, exp, fpos), rettype, map (fn Param (nm, tp) => tp) params )
     end
         (* TODO TASK 3:
 
