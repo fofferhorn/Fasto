@@ -387,6 +387,7 @@ and checkFunArg (In.FunName fname, vtab, ftab, pos) =
       case checkFun of
         _ => (Out.Lambda (rettype, params, exp, fpos), rettype, map (fn Param (nm, tp) => tp) params )
     end
+
         (* TODO TASK 3:
 
         Add case for In.Lambda.  This can be done by
