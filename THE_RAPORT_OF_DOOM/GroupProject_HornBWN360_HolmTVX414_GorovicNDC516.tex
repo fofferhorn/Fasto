@@ -8,7 +8,7 @@
 \usepackage{setspace}
 \usepackage{graphicx}
 
-\author{Oversættere\\\\Christoffer Horn\\Kristian Holm\\Damir Gorovic NDC516}
+\author{Oversættere\\\\Christoffer Horn BWN360\\Kristian Holm TVX414\\Damir Gorovic NDC516}
 \title{Group Project}
 
 \begin{document}
@@ -22,7 +22,7 @@ This report covers extensions and adjustments for the Fasto compiler language in
 \tableofcontents
 \pagebreak
 \section{Getting started}
-PERHAPS INTRO HERE
+Inside the CopyConstPropFold and CodeGen we have corrected some of the minor bugs (which we're already discovered) such as for example MINUS in codegen doing addition instead of subtraction. 
 \subsection{The lexer}
 The lexer we were given in the start of the group project contained most of the common tokens/keywords needed. We did not need to change any data which was already there, but we needed to add some new tokens and keywords which were needed for the Fasto language (such as true, false, not, if and so on). The keywords we have added has been done in the following way;\\
 \begin{verbatim}
@@ -85,6 +85,41 @@ Other than these "simple" implementations, we also implemented the anonymous fun
 \section{Typechecking}
 After we have told our
 \pagebreak
+\section{CodeGen}
+Inside the codegen file we were given a few already working functions which translated into MIPS code without a problem, such as Plus, Minus and map. We have extended the simple math expressions within CodeGen to include Not, Negate, And, Or, Times and Divide. All of which have been tested and worked without any difficulties. All of these functions were relatively simple to implement, since Divide and Times are alike, Not and Negate are alike and so on.\\\\
+The real challenge came when trying to implement the Scan and Filter functions. We knew from previous lectures and individual assignments, that Filter is similar to Map, and Scan is similar to Reduce. This helped us in the sense that we could "borrow" some of the MIPS translation and adjust them slightly.
+\begin{verbatim}
+val loop_beg = newName "loop_beg"
+val loop_end = newName "loop_end"
+val tmp_reg = newName "tmp_reg"
+val loop_header = [ Mips.LABEL (loop_beg)
+                  , Mips.SUB (tmp_reg, i_reg, size_reg)
+                  , Mips.BGEZ (tmp_reg, loop_end) ]
+\end{verbatim}
+This particular piece of code (which is from our Filter function) has been used both in Map, Reduce and Scan (in \textit{slightly} different variations) since all of these functions need to have a loop. More intuitively this can be described as a "while" expression which we know from languages such as Java or C++, to tell us when to stop the loop. 
+\subsection{Differences in similar functions}
+Up until the point of working with the CodeGen file we did not do any compiling within our Fasto language. So far we had only used interpret mode to test that our parser/lexer/interpreter was correctly implemented. This resulted in us using the \textbf{wrong} command when compiling our code. we were almost certain that we had implemented our Filter function correctly, but we could not get it to compile, therefore we started working on the Scan function instead. Somewhere in the middle of the Scan function, we got some help from a TA, and he showed us the mistake we did not know we were making; Using the "fasto -o" command instead of "fasto -c" command. Suddenly, we could compile our Filter function into MIPS code and test it.\\\\ 
+We had a single mistake of moving around information between the wrong registers which was quickly corrected. This ment though, that we could test our Scan function \textit{while} coding it, thus making it alot easier for us to discover mistakes before we went further in the code. This resulted in some slightly different syntaxes and register names within these two functions, but both work as intended and have been tested thoroughly. 
+
+\section{CopyContPropFold}
+In this part of the code we have made several intuitive and simple, yet important, optimizations using simple math expressions. It can seem very redundant to make some of these changes, but in the long run it will make our code run much faster.
+\subsection{Division and Multiplication}
+The most notable optimizations made in division and multiplication is the case where a 0 is included. What do we do when we have to divide or multiply a number with 0?\\
+The solution is sort of trivial yet important since it saves us a lot of time. When we multiply a number with 0, it always has to return 0, simple and straight forward. With division, the only exception we have to make is when dividing with zero we have to return an error and not 0, since division with 0 is not allowed.
+\begin{verbatim}
+in case (e1', e2') of
+       (Constant (IntVal x, _), Constant (IntVal y, _)) =>
+       Constant (IntVal (x*y), pos)
+     | (Constant (IntVal 0, _), _) =>
+       Constant (IntVal 0, pos)
+     | (_, Constant (IntVal 0, _)) =>
+       Constant (IntVal 0, pos)
+     | (_, Constant (IntVal 1, _)) => e1'
+     | (Constant (IntVal 1, _), _) => e2'
+     | _ => Times (e1', e2', pos)
+\end{verbatim}
+In the example shown above (which is taken from multiplication) we can see that when a 0 occurs in as one of our expressions, we simply return 0. The same is done in division, except it returns and error.
+\subsection{Negate and Not}
 \section{Tests}
 In this following section we will show relevant tests to prove the correctness of our implementations across the Fasto language.\\
 Apart from the gives tests we received with the Fasto folder (which all work and run correctly), we have implemented a few of our own to test some of the important extensions we have made.
@@ -94,7 +129,12 @@ To test that our precedence of expressions are correct we have used the followin
 fun int main() =
 write(3 + 9 - 15 * 2 / 10)
 \end{verbatim}
-This program returns the correct output "9". It does the multiplication first, then the division and thereafter the addition and subtraction.
+This program returns the correct output "9". It does the multiplication first, then the division and thereafter the addition and subtraction.\\
+Furthermore we have tested that our booleans are expressed correctly by making this slight adjustment to the program (which returns true);
+\begin{verbatim}
+fun bool main() =
+write(3 + 9 - 15 * 2 / 10 == 9)
+\end{verbatim}
 \subsection{And/Or}
 To test that our And/Or expressions are handled correctly we have used the following program;
 \begin{verbatim}

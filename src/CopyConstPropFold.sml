@@ -91,7 +91,7 @@ fun copyConstPropFoldExp vtable e =
              | _ =>
                Divide (e1', e2', pos)
         end
-      | Negate (e1, pos) =>
+   (*)   | Negate (e1, pos) =>
         let
           val e1' = copyConstPropFoldExp vtable e1
         in
@@ -100,7 +100,7 @@ fun copyConstPropFoldExp vtable e =
             | Constant (IntVal x, _) => if (x  = ~1 * x) Constant (IntVal (0-x), pos)
             |         => (e, pos')
             | _                      => Negate (e1', pos)
-        end
+        end 
       | Not (e1, pos) =>
         let
           val e1' = copyConstPropFoldExp vtable e1
@@ -110,7 +110,7 @@ fun copyConstPropFoldExp vtable e =
             | Constant (BoolVal false, _) => Constant (BoolVal true, pos) 
             | Not(e, pos')                => (e, pos')
             | _                           => Not (e1', pos)
-        end
+        end *)
       | Equal (e1, e2, pos) =>
         let val e1' = copyConstPropFoldExp vtable e1
             val e2' = copyConstPropFoldExp vtable e2

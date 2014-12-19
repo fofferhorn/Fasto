@@ -1,0 +1,15 @@
+\select@language {danish}
+\contentsline {section}{\numberline {1}Getting started}{3}
+\contentsline {subsection}{\numberline {1.1}The lexer}{3}
+\contentsline {subsection}{\numberline {1.2}The parser}{4}
+\contentsline {section}{\numberline {2}Interpreting}{5}
+\contentsline {section}{\numberline {3}Typechecking}{5}
+\contentsline {section}{\numberline {4}CodeGen}{6}
+\contentsline {subsection}{\numberline {4.1}Differences in similar functions}{6}
+\contentsline {section}{\numberline {5}CopyContPropFold}{7}
+\contentsline {subsection}{\numberline {5.1}Division and Multiplication}{7}
+\contentsline {subsection}{\numberline {5.2}Negate and Not}{8}
+\contentsline {section}{\numberline {6}Tests}{8}
+\contentsline {subsection}{\numberline {6.1}Precedence}{8}
+\contentsline {subsection}{\numberline {6.2}And/Or}{8}
+\contentsline {subsection}{\numberline {6.3}Not}{9}
