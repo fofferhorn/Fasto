@@ -1,2 +1,0 @@
-fun bool main() =
-    let x = write(3 == 1) 
