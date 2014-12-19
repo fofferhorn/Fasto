@@ -6,14 +6,14 @@
 \contentsline {section}{\numberline {3}Typechecking}{5}
 \contentsline {section}{\numberline {4}CodeGen}{6}
 \contentsline {subsection}{\numberline {4.1}Differences in similar functions}{7}
-\contentsline {section}{\numberline {5}CopyConstPropFold}{7}
-\contentsline {subsection}{\numberline {5.1}Division and Multiplication}{7}
-\contentsline {subsection}{\numberline {5.2}Negate and Not}{8}
-\contentsline {subsection}{\numberline {5.3}And and Or}{9}
-\contentsline {section}{\numberline {6}Tests}{10}
+\contentsline {section}{\numberline {5}CopyConstPropFold}{8}
+\contentsline {subsection}{\numberline {5.1}Division and Multiplication}{8}
+\contentsline {subsection}{\numberline {5.2}Negate and Not}{9}
+\contentsline {subsection}{\numberline {5.3}And and Or}{10}
+\contentsline {section}{\numberline {6}Tests}{11}
 \contentsline {subsection}{\numberline {6.1}Precedence}{11}
 \contentsline {subsection}{\numberline {6.2}And/Or}{11}
-\contentsline {subsection}{\numberline {6.3}Not}{11}
+\contentsline {subsection}{\numberline {6.3}Not}{12}
 \contentsline {subsection}{\numberline {6.4}Simple typechecking}{12}
 \contentsline {subsection}{\numberline {6.5}Optimization testing}{12}
 \contentsline {section}{\numberline {7}Appendix}{13}
@@ -24,3 +24,6 @@
 \contentsline {subsubsection}{\numberline {7.2.1}Mathematical expressions}{17}
 \contentsline {subsubsection}{\numberline {7.2.2}Scan}{18}
 \contentsline {subsubsection}{\numberline {7.2.3}Filter}{19}
+\contentsline {subsection}{\numberline {7.3}Lambda expressions}{19}
+\contentsline {subsubsection}{\numberline {7.3.1}Typechecker}{19}
+\contentsline {subsubsection}{\numberline {7.3.2}Codegen}{20}

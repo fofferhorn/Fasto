@@ -17,7 +17,7 @@
 \hfil \break
 \hfil \break
 \subsection*{Introduction}
-This report covers extensions and adjustments for the Fasto compiler language in the group project. We will describe the most significant changes and adjustments we have made in the different files, and will briefly discuss some of the tests and test results.
+This report covers extensions and adjustments for the Fasto compiler language in the group project. We will describe the most significant changes and adjustments we have made in the different files, and will briefly discuss some of the tests and test results. Assignment 5 has not been completed and the tests for that section will therefore not work.
 \pagebreak
 \tableofcontents
 \pagebreak
@@ -90,7 +90,8 @@ The typechecker was implemented with Multiplication, division, boolean operators
 Filter and scan and was also implemented in the typechecker. We used code from reduce to complete filter in the typechecker. Reduce have the same parameter and where very similar to scan, so we only change the name from reduce to scan, and a elem\_type to arr\_type to finish scan.
 \\\\
 To create filter we took a copy of map and change map to filter. We removed one parameter from map to filter, because filter cannot change the return type. We also changed filter to return a bool as its result.
-
+\\\\
+We've implemented the Lambda expression into the typechecker. This was done by by extending the already given function "CheckFunArg" with a case of the anonymous function known as Lambda.
 \section{CodeGen}
 Inside the codegen file we were given a few already working functions which translated into MIPS code without a problem, such as Plus, Minus and map. We have extended the simple math expressions within CodeGen to include Not, Negate, And, Or, Times and Divide. All of which have been tested and worked without any difficulties. All of these functions were relatively simple to implement, since Divide and Times are alike, Not and Negate are alike and so on.\\\\
 The real challenge came when trying to implement the Scan and Filter functions. We knew from previous lectures and individual assignments, that Filter is similar to Map, and Scan is similar to Reduce. This helped us in the sense that we could "borrow" some of the code from the two functions Map and Reduce and adjust them.
@@ -105,7 +106,8 @@ val loop_header = [ Mips.LABEL (loop_beg)
 This particular piece of code (which is from our Filter function) has been used both in Map, Reduce and Scan (in \textit{slightly} different variations) since all of these functions need to have a loop. More intuitively this can be described as a "while" expression which we know from languages such as Java or C++, to tell us when to stop the loop. 
 \subsection{Differences in similar functions}
 Up until the point of working with the CodeGen file we did not do any compiling within our Fasto language. So far we had only used interpret mode to test that our parser/lexer/interpreter was correctly implemented. This resulted in us using the \textbf{wrong} command when compiling our code. we were almost certain that we had implemented our Filter function correctly, but we could not get it to compile, therefore we started working on the Scan function instead. Somewhere in the middle of the Scan function, we got some help from a TA, and he showed us the mistake we did not know we were making; Using the "fasto -o" command instead of "fasto -c" command. Suddenly, we could compile our Filter function into MIPS code and test it.\\\\ 
-We had a single mistake of moving around information between the wrong registers which was quickly corrected. This ment though, that we could test our Scan function \textit{while} coding it, thus making it alot easier for us to discover mistakes before we went further in the code. This resulted in some slightly different syntaxes and register names within these two functions, but both work as intended and have been tested thoroughly. 
+We had a single mistake of moving around information between the wrong registers which was quickly corrected. This ment though, that we could test our Scan function \textit{while} coding it, thus making it alot easier for us to discover mistakes before we went further in the code. This resulted in some slightly different syntaxes and register names within these two functions, but both work as intended and have been tested thoroughly. \\\\
+Other than Scan and Filter which were the biggest implementations in Codegen, we also had to implement the Lambda expression here. This was done by extending the already given function "applyFunArg". Intuitively, what we do is "compile" the lambda expression and save it to a Ftable and insert it into our already used Ftable. This is done so that our function is available throughout the whole function but not available when we exit the given function, thus making it an "anonymous" function.
 
 \section{CopyConstPropFold}
 In this part of the code we have made several intuitive and simple, yet important, optimizations using simple math expressions. It can seem very redundant to make some of these changes, but in the long run it will make our code run much faster.
@@ -529,7 +531,35 @@ let val arr_reg  = newName "arr_reg"   (* address of input array *)
                          ^ ppType f_arg_type , pos)
     end
 \end{verbatim}
-
+\subsection{Lambda expressions}
+\subsubsection{Typechecker}
+\begin{verbatim}
+| checkFunArg (In.Lambda (rettype, params, body, fpos)
+              , vtab, ftab, pos) =
+    let 
+      val fundec = In.FunDec("unnamed", rettype, params, body, fpos)
+      val (Out.FunDec(f, rettype, params, body', fpos)) =
+       checkFunWithVtable(fundec, vtab, ftab, pos)
+      val argTypes = map (fn Param (nm, tp) => tp) params
+    in
+      (Out.Lambda (rettype, params, body', fpos), rettype, argTypes )
+    end
+\end{verbatim}
+\subsubsection{Codegen}
+\begin{verbatim}
+    | applyFunArg (Lambda (rettype, params, body, fpos)
+                  , args, vtable, place, pos) =
+      let
+        val tmp_reg = newName "tmp_reg"
+        fun bindArg(Param(name, tp), arg, vtab) = 
+        SymTab.bind name arg vtab
+        val vtab' = SymTab.empty()
+        val vtab' = ListPair.foldr bindArg vtab' (params, args)
+        val code = compileExp body vtab' tmp_reg
+      in
+         code @ [Mips.MOVE(place, tmp_reg)]
+      end
+\end{verbatim}
 
 
 \end{document}
