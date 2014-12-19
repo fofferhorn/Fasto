@@ -809,24 +809,17 @@ structure CodeGen = struct
       in  
         applyRegs(s, args, tmp_reg, pos) @ [Mips.MOVE(place, tmp_reg)] 
       end
-      (*
-    | applyFunArg (Lambda (rettype, params, body, fpos), args, vtable, place, pos) : Mips.Prog =
+
+    | applyFunArg (Lambda (rettype, params, body, fpos), args, vtable, place, pos) =
       let
         val tmp_reg = newName "tmp_reg"
-        val compiled_body = compileExp body vtable tmp_reg
-        val param_list = map (fn Param (p, tp) => p) params
+        fun bindArg(Param(name, tp), arg, vtab) = SymTab.bind name arg vtab
+        val vtab' = SymTab.empty()
+        val vtab' = ListPair.foldr bindArg vtab' (params, args)
+        val code = compileExp body vtab' tmp_reg
       in
-          compiled_body 
-        @ applyRegs(Lambda (rettype, params, body, fpos), args, tmp_reg, pos) 
-        @ [Mips.MOVE(place, tmp_reg)] 
-      end *)
-     (* TODO TASK 3:
-        Add case for Lambda.  This is very similar to how function
-        definitions work.  You need to bind the parameters of the
-        Lambda to the registers in 'args', compile the body of the
-        lambda, then finally move the result of the body to the
-        'place' register.
-      *)
+         code @ [Mips.MOVE(place, tmp_reg)]
+      end
 
   (* compile condition *)
   and compileCond c vtable tlab flab =

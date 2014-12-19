@@ -356,21 +356,11 @@ and checkFunArg (In.FunName fname, vtab, ftab, pos) =
   | checkFunArg (In.Lambda (rettype, params, body, fpos), vtab, ftab, pos) =
     let 
       val fundec = In.FunDec("unnamed", rettype, params, body, fpos)
-      val checkFun = checkFunWithVtable(fundec, vtab, ftab, pos)
-      val (tp, exp) = checkExp ftab vtab body
+      val (Out.FunDec(f, rettype, params, body', fpos)) = checkFunWithVtable(fundec, vtab, ftab, pos)
+      val argTypes = map (fn Param (nm, tp) => tp) params
     in
-      case checkFun of
-        _ => (Out.Lambda (rettype, params, exp, fpos), rettype, map (fn Param (nm, tp) => tp) params )
+      (Out.Lambda (rettype, params, body', fpos), rettype, argTypes )
     end
-
-        (* TODO TASK 3:
-
-        Add case for In.Lambda.  This can be done by
-        constructing an appropriate In.FunDec and passing it to
-        checkFunWithVtable, then constructing an Out.Lambda from the
-        result. 
-  
-    *)
 
 (* Check a function declaration, but using a given vtable rather
 than an empty one. *)

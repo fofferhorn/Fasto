@@ -40,6 +40,7 @@
        | "char"         => Parser.CHAR pos
        | "fun"          => Parser.FUN pos
        | "not"          => Parser.NOT pos
+       | "fn"           => Parser.FN pos
 
 (* specials: *)
        | "iota"         => Parser.IOTA pos
@@ -91,6 +92,7 @@ rule Token = parse
   | `~`                 { Parser.NEGATE    (getPos lexbuf) }
   | "=="                { Parser.DEQ       (getPos lexbuf) }
   | `=`                 { Parser.EQ        (getPos lexbuf) }
+  | "=>"                { Parser.PIL       (getPos lexbuf) }
   | `<`                 { Parser.LTH       (getPos lexbuf) }
   | `(`                 { Parser.LPAR      (getPos lexbuf) }
   | `)`                 { Parser.RPAR      (getPos lexbuf) }
