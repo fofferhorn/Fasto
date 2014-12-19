@@ -253,7 +253,8 @@ structure CodeGen = struct
             val code1 = compileExp e1 vtable t1
             val code2 = compileExp e2 vtable t2
         in 
-code1 @ code2 @ [Mips.DIV (place,t1,t2)]
+          if e2 = Constant (IntVal 0, pos) then raise Error("Division with zero", pos)
+          else code1 @ code2 @ [Mips.DIV (place,t1,t2)]
         end
     | Negate (e1, pos) =>
         let val t = newName "negate"

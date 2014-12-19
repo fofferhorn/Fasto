@@ -8,6 +8,8 @@ structure CopyConstPropFold = struct
 open Fasto
 open Fasto.KnownTypes
 
+exception Error of string * pos
+
 (* A propagatee is something that we can propagate - either a variable
    name or a constant value. *)
 datatype Propagatee = ConstProp of Value
@@ -36,12 +38,6 @@ fun copyConstPropFoldExp vtable e =
                 SOME (VarProp newname) => Var (newname, pos)    (* copy propag *)
               | SOME (ConstProp value) => Constant (value, pos) (* const propag *)
               | _                      => Var (name, pos))      (* no propagation *)
-
-        (* TODO TASK 4: This case currently does nothing.
-
-         You must perform a lookup in the symbol table and if you find
-         a Propagatee, return either a new Var or Constant node. *)
-
       | Plus (e1, e2, pos) =>
         let val e1' = copyConstPropFoldExp vtable e1
             val e2' = copyConstPropFoldExp vtable e2
@@ -84,11 +80,16 @@ fun copyConstPropFoldExp vtable e =
         let val e1' = copyConstPropFoldExp vtable e1
             val e2' = copyConstPropFoldExp vtable e2
         in case (e1', e2') of
-               (Constant (IntVal x, _), Constant (IntVal y, _)) =>
+               (_                     , Constant (IntVal 0, _)) => 
+               raise Error("Division with zero", pos)
+
+             | (Constant (IntVal x, _), Constant (IntVal y, _)) => 
                Constant (IntVal (Int.quot(x,y)), pos)
-             | (Constant (IntVal 0, _), _) =>
+
+             | (Constant (IntVal 0, _),          _            ) => 
                Constant (IntVal 0, pos)
-             | _ =>
+               
+             | _                                                => 
                Divide (e1', e2', pos)
         end
       | Negate (e1, pos) =>
@@ -97,8 +98,8 @@ fun copyConstPropFoldExp vtable e =
         in
           case e1' of
               Constant (IntVal 0, _) => Constant (IntVal 0, pos)
-            | Constant (IntVal x, _) => if (x  = ~1 * x) Constant (IntVal (0-x), pos)
-            |         => (e, pos')
+            | Constant (IntVal x, _) => Constant (IntVal (0-x), pos)
+            | Negate (e, _)          => e
             | _                      => Negate (e1', pos)
         end
       | Not (e1, pos) =>
@@ -108,7 +109,7 @@ fun copyConstPropFoldExp vtable e =
           case e1' of
               Constant (BoolVal true, _)  => Constant (BoolVal false, pos)
             | Constant (BoolVal false, _) => Constant (BoolVal true, pos) 
-            | Not(e, pos')                => (e, pos')
+            | Not(e, _)                   => e
             | _                           => Not (e1', pos)
         end
       | Equal (e1, e2, pos) =>
@@ -179,15 +180,7 @@ fun copyConstPropFoldExp vtable e =
             val body'   = copyConstPropFoldExp vtable' body (* optimize body *)
           in 
             Let (Dec (name, e', decpos), body', pos)        (* return optimized Let expression *)
-          end   
-
-        (* TODO TASK 4: This case currently does nothing.
-
-         You must extend this case to expand the vtable' with whatever
-         Propagatee that you can get out of e'.  That is, inspect e'
-         to see whether it is a constant or variable, and if so,
-         insert the appropriate Propagatee value in vtable. *)
-
+          end
       | Index (name, e, t, pos) =>
         let val e' = copyConstPropFoldExp vtable e
         in (* We can only copy-propagate variables for indexing. *)
@@ -228,10 +221,6 @@ fun copyConstPropFoldExp vtable e =
         Read (t, pos)
       | Write (e, t, pos) =>
         Write (copyConstPropFoldExp vtable e, t, pos)
-
-  (* TODO TASKS 1/4: add cases for Times, Divide, Negate, Not, And, Or.  Look at
-  how Plus and Minus are implemented for inspiration.
-   *)
 
 and copyConstPropFoldFunArg vtable (FunName fname) =
     FunName fname

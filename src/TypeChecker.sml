@@ -250,31 +250,6 @@ and checkExp ftab vtab (exp : In.Exp)
                               ^ ppType f_arg_type , pos)
          end
 
-    | In.Map (f, arr_exp, _, _, pos)
-      => let val (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
-             val elem_type =
-               case arr_type of
-                   Array t => t
-                 | other   => raise Error ("Map: Argument not an array ", pos)
-             val (f', f_res_type, f_arg_type) =
-               case checkFunArg (f, vtab, ftab, pos) of
-                   (f', res, [a1]) => (f', res, a1)
-                 | (_,  res, args) =>
-                   raise Error ("Map: incompatible function type of "
-                                ^ In.ppFunArg 0 f ^ ":" ^ showFunType (args, res), pos)
-         in if elem_type = f_arg_type
-            then (Array f_res_type,
-                  Out.Map (f', arr_exp_dec, elem_type, f_res_type, pos))
-            else raise Error ("Map: array element types does not match. "
-                              ^ ppType elem_type ^ " instead of "
-                              ^ ppType f_arg_type , pos)
-         end
-
-  (* TODO: TASK 2: Add case for Filter.  Quite similar to map, except that the
-     return type is the same as the input array type, and the function must
-     return bool.
-     *)
-
     | In.Filter (f, arr_exp, _, pos)
       => let val (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
              val elem_type =
