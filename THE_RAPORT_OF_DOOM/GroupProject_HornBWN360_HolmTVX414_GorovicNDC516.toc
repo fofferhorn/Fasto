@@ -6,16 +6,17 @@
 \contentsline {section}{\numberline {3}Typechecking}{5}
 \contentsline {section}{\numberline {4}CodeGen}{6}
 \contentsline {subsection}{\numberline {4.1}Differences in similar functions}{6}
-\contentsline {section}{\numberline {5}CopyContPropFold}{7}
+\contentsline {section}{\numberline {5}CopyConstPropFold}{7}
 \contentsline {subsection}{\numberline {5.1}Division and Multiplication}{7}
 \contentsline {subsection}{\numberline {5.2}Negate and Not}{8}
-\contentsline {section}{\numberline {6}Tests}{8}
-\contentsline {subsection}{\numberline {6.1}Precedence}{8}
-\contentsline {subsection}{\numberline {6.2}And/Or}{8}
-\contentsline {subsection}{\numberline {6.3}Not}{9}
-\contentsline {subsection}{\numberline {6.4}Simple typechecking}{9}
-\contentsline {subsection}{\numberline {6.5}Redundant testing}{9}
-\contentsline {section}{\numberline {7}Appendix}{10}
-\contentsline {subsection}{\numberline {7.1}A - CodeGen}{10}
-\contentsline {subsubsection}{\numberline {7.1.1}Filter}{10}
-\contentsline {subsubsection}{\numberline {7.1.2}Scan}{12}
+\contentsline {subsection}{\numberline {5.3}And and Or}{9}
+\contentsline {section}{\numberline {6}Tests}{10}
+\contentsline {subsection}{\numberline {6.1}Precedence}{10}
+\contentsline {subsection}{\numberline {6.2}And/Or}{11}
+\contentsline {subsection}{\numberline {6.3}Not}{11}
+\contentsline {subsection}{\numberline {6.4}Simple typechecking}{11}
+\contentsline {subsection}{\numberline {6.5}Redundant testing}{12}
+\contentsline {section}{\numberline {7}Appendix}{13}
+\contentsline {subsection}{\numberline {7.1}A - CodeGen}{13}
+\contentsline {subsubsection}{\numberline {7.1.1}Filter}{13}
+\contentsline {subsubsection}{\numberline {7.1.2}Scan}{15}

@@ -111,7 +111,7 @@ Division and Multiplication are quite similar. The optimization we have done is:
 $0 \cdot x = 0$\\
 $0/x = 0$\\
 $1 \cdot x = x$
-\begin{center}
+\end{center}
 These have been implemented in the following way:
 \begin{verbatim}
 | Times (e1, e2, pos) =>
@@ -177,8 +177,8 @@ These have been implemented in the following way:
 \subsection{And and Or}
 Ïn the cases of And and Or, we have done some optimization. The optimization we have done is:
 \begin{center}
-false and _ = false\\
-true or _ = true
+false and \_ = false\\
+true or \_ = true
 \end{center}
 This have been implemented in the following way:
 \begin{verbatim}
@@ -187,14 +187,17 @@ This have been implemented in the following way:
       val e2' = copyConstPropFoldExp vtable e2
   in 
     case e1' of
-          Constant (BoolVal true, pos)  => 
-              (case e2' of
-                    Constant (BoolVal true, pos)  => Constant (BoolVal true, pos)
-                  | Constant (BoolVal false, pos) => Constant (BoolVal false, pos)
-                  | _                             => And (Constant (BoolVal true, pos), e2', pos)
-              )
-        | Constant (BoolVal false, pos) => Constant(BoolVal false, pos)
-        | _                             => And (e1', e2', pos)
+       Constant (BoolVal true, pos)  => 
+           (case e2' of
+                 Constant (BoolVal true, pos)  => 
+                 Constant (BoolVal true, pos)
+               | Constant (BoolVal false, pos) => 
+               Constant (BoolVal false, pos)
+               | _                             => 
+               And (Constant (BoolVal true, pos), e2', pos)
+           )
+     | Constant (BoolVal false, pos) => Constant(BoolVal false, pos)
+     | _                             => And (e1', e2', pos)
   end
 | Or (e1, e2, pos) =>
   let val e1' = copyConstPropFoldExp vtable e1
@@ -203,9 +206,12 @@ This have been implemented in the following way:
     case e1' of
           Constant (BoolVal false, pos)  => 
               (case e2' of
-                    Constant (BoolVal true, pos)  => Constant (BoolVal true, pos)
-                  | Constant (BoolVal false, pos) => Constant (BoolVal false, pos)
-                  | _                             => Or (Constant (BoolVal false, pos), e2', pos)
+                    Constant (BoolVal true, pos)  => 
+                    Constant (BoolVal true, pos)
+                  | Constant (BoolVal false, pos) => 
+                  Constant (BoolVal false, pos)
+                  | _                             => 
+                  Or (Constant (BoolVal false, pos), e2', pos)
               )
         | Constant (BoolVal true, pos) => Constant(BoolVal true, pos)
         | _                             => Or (e1', e2', pos)

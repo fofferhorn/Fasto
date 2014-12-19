@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.11.18)  19 DEC 2014 12:58
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.11.18)  19 DEC 2014 13:05
 entering extended mode
 **GroupProject_HornBWN360_HolmTVX414_GorovicNDC516.tex
 
@@ -596,55 +596,89 @@ Underfull \hbox (badness 10000) in paragraph at lines 102--104
 
  []
 
-[6] [7] [8] [9]
-Overfull \hbox (54.49146pt too wide) in paragraph at lines 182--182
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+
+ []
+
+[7]
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
+
+ []
+
+[8]
+Overfull \hbox (29.79749pt too wide) in paragraph at lines 170--170
+[]        \T1/cmtt/m/n/12 Constant (BoolVal true, _)  => Constant (BoolVal fals
+e, pos)[] 
+ []
+
+
+Overfull \hbox (23.624pt too wide) in paragraph at lines 171--171
+[]      \T1/cmtt/m/n/12 | Constant (BoolVal false, _) => Constant (BoolVal true
+, pos)[] 
+ []
+
+
+Overfull \hbox (29.79749pt too wide) in paragraph at lines 199--199
+[]     \T1/cmtt/m/n/12 | Constant (BoolVal false, pos) => Constant(BoolVal fals
+e, pos)[] 
+ []
+
+[9]
+Overfull \hbox (35.97098pt too wide) in paragraph at lines 216--216
+[]        \T1/cmtt/m/n/12 | Constant (BoolVal true, pos) => Constant(BoolVal tr
+ue, pos)[] 
+ []
+
+[10] [11] [12]
+Overfull \hbox (54.49146pt too wide) in paragraph at lines 279--279
 []  \T1/cmtt/m/n/12 let val size_reg = newName "size_reg" (* size of input/outp
 ut array *)[] 
  []
 
 
-Overfull \hbox (48.31796pt too wide) in paragraph at lines 184--184
+Overfull \hbox (48.31796pt too wide) in paragraph at lines 281--281
 []      \T1/cmtt/m/n/12 val elem_reg = newName "elem_reg" (* address of single 
 element *)[] 
  []
 
 
-Overfull \hbox (23.624pt too wide) in paragraph at lines 209--209
+Overfull \hbox (23.624pt too wide) in paragraph at lines 306--306
 []\T1/cmtt/m/n/12 (* filter is 'if f(old_arr[i]) = true then arr[j] = old_arr[i
 ]'. *)[] 
  []
 
-[10] [11]
-Overfull \hbox (23.624pt too wide) in paragraph at lines 257--257
+[13] [14]
+Overfull \hbox (23.624pt too wide) in paragraph at lines 354--354
 []\T1/cmtt/m/n/12 let val arr_reg  = newName "arr_reg"   (* address of input ar
 ray *)[] 
  []
 
 
-Overfull \hbox (48.31796pt too wide) in paragraph at lines 258--258
+Overfull \hbox (48.31796pt too wide) in paragraph at lines 355--355
 []    \T1/cmtt/m/n/12 val size_reg = newName "size_reg"  (* size of input/outpu
 t array *)[] 
  []
 
 
-Overfull \hbox (35.97098pt too wide) in paragraph at lines 276--276
+Overfull \hbox (35.97098pt too wide) in paragraph at lines 373--373
 []    \T1/cmtt/m/n/12 (* Compile initial value into 0[place] (will be updated b
 elow) *)[] 
  []
 
-[12]
-Overfull \hbox (11.27701pt too wide) in paragraph at lines 310--310
+[15]
+Overfull \hbox (11.27701pt too wide) in paragraph at lines 407--407
 []                      \T1/cmtt/m/n/12 One  => [ Mips.SB(res_reg, addr_reg, "0
 ") ][] 
  []
 
 
-Overfull \hbox (11.27701pt too wide) in paragraph at lines 311--311
+Overfull \hbox (11.27701pt too wide) in paragraph at lines 408--408
 []                    \T1/cmtt/m/n/12 | Four => [ Mips.SW(res_reg, addr_reg, "0
 ") ][] 
  []
 
-[13] [14]
+[16] [17]
 ("C:\Users\Damir\Desktop\Oversætter gruppe\Fasto\THE_RAPORT_OF_DOOM\GroupProje
 ct_HornBWN360_HolmTVX414_GorovicNDC516.aux") ) 
 Here is how much of TeX's memory you used:
@@ -657,20 +691,22 @@ Here is how much of TeX's memory you used:
  27i,8n,24p,3280b,252s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/font
 s/enc/dvips/cm-super/cm-super-t1.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/p
-ublic/cm-super/sfbx1200.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-
-super/sfbx1440.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfb
-x1728.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm0700.pfb
-><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm0800.pfb><C:/Prog
-ram Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1000.pfb><C:/Program Files
-/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1200.pfb><C:/Program Files/MiKTeX 2
-.9/fonts/type1/public/cm-super/sfrm1440.pfb><C:/Program Files/MiKTeX 2.9/fonts/
-type1/public/cm-super/sfrm2074.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/pub
-lic/cm-super/sfti1200.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-su
-per/sftt1200.pfb>
-Output written on GroupProject_HornBWN360_HolmTVX414_GorovicNDC516.pdf (14 page
-s, 208178 bytes).
+ublic/amsfonts/cm/cmmi12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/am
+sfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
+/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1200.p
+fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1440.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1728.pfb><C:/Program Fil
+es/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm0700.pfb><C:/Program Files/MiKTeX
+ 2.9/fonts/type1/public/cm-super/sfrm0800.pfb><C:/Program Files/MiKTeX 2.9/font
+s/type1/public/cm-super/sfrm1000.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
+ublic/cm-super/sfrm1200.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-
+super/sfrm1440.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfr
+m2074.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sfti1200.pfb
+><C:/Program Files/MiKTeX 2.9/fonts/type1/public/cm-super/sftt1200.pfb>
+Output written on GroupProject_HornBWN360_HolmTVX414_GorovicNDC516.pdf (17 page
+s, 235324 bytes).
 PDF statistics:
- 93 PDF objects out of 1000 (max. 8388607)
+ 114 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
