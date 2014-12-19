@@ -150,6 +150,25 @@ fun bool main() =
 write(not false)
 \end{verbatim}
 This returns true which is the result we expect.
+\subsection{Simple typechecking}
+Except for the fact that we do not get any type checking errors in the other tests, we found it necessary to make a test which would give us a type error to ensure this was implemented correctly. The test looks as follows;
+\begin{verbatim}
+fun bool main() =
+    write(not 3)
+\end{verbatim}
+This program returns "Type error: Cannot unify types bool and int at line 2 column 11", which is what we want.
+\subsection{Redundant testing}
+This section will cover some of the more redundant test we have made to make sure that our implementations are correct. These tests will include a "double negate" and a "double not" function. Below can be seen an example of how we have made sure, that we can use double not or double negate expressions;
+\begin{verbatim}
+fun bool main() =
+    write(not not true)
+    
+fun int main() =
+    write(~~1)
+\end{verbatim}
+Both of these functions are compiled correctly and return the right result. In the first program we would like to return "true" and in the second program we want to return "1".
+
+\pagebreak
 
 \section{Appendix}
 \subsection{A - CodeGen}
@@ -166,13 +185,15 @@ Filter (farg, arr_exp, elem_type, pos) =>
       val res_reg  = newName "res_reg"  (* result register *)
       val arr_code = compileExp arr_exp vtable arr_reg
 
-      val get_size = [ Mips.LW (size_reg, arr_reg, "0") ] (* Gets the size of the input array *)
+      val get_size = [ Mips.LW (size_reg, arr_reg, "0") ] 
+      (* Gets the size of the input array *)
       
       val alloc_space = dynalloc(size_reg, place, elem_type)
 
       val i_reg    = newName "i_reg"    (* the invariant i *)
       val j_reg = newName "j_reg"
-      val addr_reg = newName "addr_reg" (* address of element in new array *)
+      val addr_reg = newName "addr_reg" 
+      (* address of element in new array *)
 
       val init_regs = [ Mips.ADDI (addr_reg, place, "4")
                       , Mips.MOVE (i_reg, "0")
@@ -185,16 +206,18 @@ Filter (farg, arr_exp, elem_type, pos) =>
                         , Mips.SUB (tmp_reg, i_reg, size_reg)
                         , Mips.BGEZ (tmp_reg, loop_end) ]
 
-      (* filter is 'if f(old_arr[i]) = true then arr[j] = old_arr[i]'. *)
+(* filter is 'if f(old_arr[i]) = true then arr[j] = old_arr[i]'. *)
       val arr_val = newName "arr_val"
       val loop_filter0 =
           case getElemSize elem_type of
               One  => Mips.LB(arr_val, elem_reg, "0")
-                      :: applyFunArg(farg, [arr_val], vtable, res_reg, pos)
+                      :: applyFunArg(farg, [arr_val], 
+                      vtable, res_reg, pos)
                       @ [ Mips.ADDI(elem_reg, elem_reg, "1") ]
                       @ [ Mips.ADDI (i_reg, i_reg, "1") ]
             | Four => Mips.LW(arr_val, elem_reg, "0")
-                      :: applyFunArg(farg, [arr_val], vtable, res_reg, pos)
+                      :: applyFunArg(farg, [arr_val], 
+                      vtable, res_reg, pos)
                       @ [ Mips.ADDI(elem_reg, elem_reg, "4") ]
                       @ [ Mips.ADDI (i_reg, i_reg, "1") ]
 
@@ -206,13 +229,13 @@ Filter (farg, arr_exp, elem_type, pos) =>
             | Four => [ Mips.SW (arr_val, addr_reg, "0") ]
 
       val loop_footer =
-          [ Mips.ADDI (addr_reg, addr_reg,
-                       makeConst (elemSizeToInt (getElemSize elem_type)))
-          , Mips.ADDI (j_reg, j_reg, "1")
-          , Mips.J loop_beg
-          , Mips.LABEL loop_end
-          , Mips.SW (j_reg, place, "0")
-          ]
+     [ Mips.ADDI (addr_reg, addr_reg,
+            makeConst (elemSizeToInt (getElemSize elem_type)))
+     , Mips.ADDI (j_reg, j_reg, "1")
+     , Mips.J loop_beg
+     , Mips.LABEL loop_end
+     , Mips.SW (j_reg, place, "0")
+     ]
 
   in
     arr_code
@@ -226,67 +249,72 @@ Filter (farg, arr_exp, elem_type, pos) =>
     @ loop_footer
   end
 \end{verbatim}
-
+\hfill
+\hfill
 \subsubsection{Scan}
 \begin{verbatim}
 Scan (binop, acc_exp, arr_exp, tp, pos) =>
-  let val arr_reg  = newName "arr_reg"   (* address of input array *)
-      val size_reg = newName "size_reg"  (* size of input/output array *)
-      val i_reg    = newName "i_reg"     (* loop counter *)
-      val tmp_reg  = newName "tmp_reg"   (* several purposes *)
-      val res_reg  = newName "res_reg"   (* result register of function calls *)
-      val addr_reg = newName "addr_reg"
+let val arr_reg  = newName "arr_reg"   (* address of input array *)
+    val size_reg = newName "size_reg"  (* size of input/output array *)
+    val i_reg    = newName "i_reg"     (* loop counter *)
+    val tmp_reg  = newName "tmp_reg"   (* several purposes *)
+    val res_reg  = newName "res_reg"   
+    (* result register of function calls *)
+    val addr_reg = newName "addr_reg"
 
-      val loop_beg = newName "loop_beg"
-      val loop_end = newName "loop_end"
+    val loop_beg = newName "loop_beg"
+    val loop_end = newName "loop_end"
 
-      val arr_code = compileExp arr_exp vtable arr_reg
+    val arr_code = compileExp arr_exp vtable arr_reg
 
-      val get_size = [ Mips.LW (size_reg, arr_reg, "0") ] (* Gets the size of the input array *)
+    val get_size = [ Mips.LW (size_reg, arr_reg, "0") ] 
+    (* Gets the size of the input array *)
 
-      val alloc_space = [ Mips.ADDI (size_reg, size_reg, "1") ]
-                        @ dynalloc(size_reg, place, tp)
+    val alloc_space = [ Mips.ADDI (size_reg, size_reg, "1") ]
+                      @ dynalloc(size_reg, place, tp)
 
-      (* Compile initial value into 0[place] (will be updated below) *)
-      val acc_code = compileExp acc_exp vtable res_reg 
+    (* Compile initial value into 0[place] (will be updated below) *)
+    val acc_code = compileExp acc_exp vtable res_reg 
 
-      val save_init = case getElemSize tp of
-                        One  => [ Mips.SB (res_reg, place, "1")
-                                , Mips.ADDI (addr_reg, place, "1")
-                                , Mips.ADDI (arr_reg, arr_reg, "1")]
-                      | Four => [ Mips.SW (res_reg, place, "4")
-                                , Mips.ADDI (addr_reg, place, "4")
-                                , Mips.ADDI (arr_reg, arr_reg, "4")]
+    val save_init = case getElemSize tp of
+              One  => [ Mips.SB (res_reg, place, "1")
+                      , Mips.ADDI (addr_reg, place, "1")
+                      , Mips.ADDI (arr_reg, arr_reg, "1")]
+            | Four => [ Mips.SW (res_reg, place, "4")
+                      , Mips.ADDI (addr_reg, place, "4")
+                      , Mips.ADDI (arr_reg, arr_reg, "4")]
 
-      (* Set i_reg to 0. While i < size_reg, loop. *)
-      val loop_code =
-          [ Mips.MOVE (i_reg, "0")
-          , Mips.LABEL (loop_beg)
-          , Mips.SUB (tmp_reg, i_reg, size_reg)
-          , Mips.BGEZ (tmp_reg, loop_end) ]
+    (* Set i_reg to 0. While i < size_reg, loop. *)
+    val loop_code =
+        [ Mips.MOVE (i_reg, "0")
+        , Mips.LABEL (loop_beg)
+        , Mips.SUB (tmp_reg, i_reg, size_reg)
+        , Mips.BGEZ (tmp_reg, loop_end) ]
 
       (* Load arr[i] into tmp_reg *)
-      val load_code =
-          case getElemSize tp of
-              One =>  Mips.LB   (tmp_reg, arr_reg, "0")
-                      :: applyFunArg(binop, [res_reg, tmp_reg], vtable, res_reg, pos)
-                      @ [ Mips.ADDI (arr_reg, arr_reg, "1") ]
-                      @ [ Mips.ADDI (addr_reg, addr_reg, "1") ]
-            | Four => Mips.LW   (tmp_reg, arr_reg, "0")
-                      :: applyFunArg(binop, [res_reg, tmp_reg], vtable, res_reg, pos)
-                      @ [ Mips.ADDI (arr_reg, arr_reg, "4") ]
-                      @ [ Mips.ADDI (addr_reg, addr_reg, "4") ]
+    val load_code =
+        case getElemSize tp of
+            One =>  Mips.LB   (tmp_reg, arr_reg, "0")
+                    :: applyFunArg(binop, [res_reg, tmp_reg], 
+                    vtable, res_reg, pos)
+                    @ [ Mips.ADDI (arr_reg, arr_reg, "1") ]
+                    @ [ Mips.ADDI (addr_reg, addr_reg, "1") ]
+          | Four => Mips.LW   (tmp_reg, arr_reg, "0")
+                    :: applyFunArg(binop, [res_reg, tmp_reg], 
+                    vtable, res_reg, pos)
+                    @ [ Mips.ADDI (arr_reg, arr_reg, "4") ]
+                    @ [ Mips.ADDI (addr_reg, addr_reg, "4") ]
 
-      val save_to_arr =
-          case getElemSize tp of
-                        One  => [ Mips.SB(res_reg, addr_reg, "0") ]
-                      | Four => [ Mips.SW(res_reg, addr_reg, "0") ]
+    val save_to_arr =
+        case getElemSize tp of
+                      One  => [ Mips.SB(res_reg, addr_reg, "0") ]
+                    | Four => [ Mips.SW(res_reg, addr_reg, "0") ]
 
-      val loop_footer =
-          [ Mips.ADDI (i_reg, i_reg, "1")
-          , Mips.J loop_beg
-          , Mips.LABEL loop_end
-          ]
+    val loop_footer =
+        [ Mips.ADDI (i_reg, i_reg, "1")
+        , Mips.J loop_beg
+        , Mips.LABEL loop_end
+        ]
 
   in   arr_code 
      @ get_size

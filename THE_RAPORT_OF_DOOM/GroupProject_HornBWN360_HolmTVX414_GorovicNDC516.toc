@@ -13,3 +13,9 @@
 \contentsline {subsection}{\numberline {6.1}Precedence}{8}
 \contentsline {subsection}{\numberline {6.2}And/Or}{8}
 \contentsline {subsection}{\numberline {6.3}Not}{9}
+\contentsline {subsection}{\numberline {6.4}Simple typechecking}{9}
+\contentsline {subsection}{\numberline {6.5}Redundant testing}{9}
+\contentsline {section}{\numberline {7}Appendix}{10}
+\contentsline {subsection}{\numberline {7.1}A - CodeGen}{10}
+\contentsline {subsubsection}{\numberline {7.1.1}Filter}{10}
+\contentsline {subsubsection}{\numberline {7.1.2}Scan}{12}
