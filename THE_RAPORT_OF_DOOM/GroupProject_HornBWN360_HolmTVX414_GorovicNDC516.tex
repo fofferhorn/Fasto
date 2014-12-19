@@ -102,25 +102,116 @@ This particular piece of code (which is from our Filter function) has been used 
 Up until the point of working with the CodeGen file we did not do any compiling within our Fasto language. So far we had only used interpret mode to test that our parser/lexer/interpreter was correctly implemented. This resulted in us using the \textbf{wrong} command when compiling our code. we were almost certain that we had implemented our Filter function correctly, but we could not get it to compile, therefore we started working on the Scan function instead. Somewhere in the middle of the Scan function, we got some help from a TA, and he showed us the mistake we did not know we were making; Using the "fasto -o" command instead of "fasto -c" command. Suddenly, we could compile our Filter function into MIPS code and test it.\\\\ 
 We had a single mistake of moving around information between the wrong registers which was quickly corrected. This ment though, that we could test our Scan function \textit{while} coding it, thus making it alot easier for us to discover mistakes before we went further in the code. This resulted in some slightly different syntaxes and register names within these two functions, but both work as intended and have been tested thoroughly. 
 
-\section{CopyContPropFold}
+\section{CopyConstPropFold}
 In this part of the code we have made several intuitive and simple, yet important, optimizations using simple math expressions. It can seem very redundant to make some of these changes, but in the long run it will make our code run much faster.
+
 \subsection{Division and Multiplication}
-The most notable optimizations made in division and multiplication is the case where a 0 is included. What do we do when we have to divide or multiply a number with 0?\\
-The solution is sort of trivial yet important since it saves us a lot of time. When we multiply a number with 0, it always has to return 0, simple and straight forward. With division, the only exception we have to make is when dividing with zero we have to return an error and not 0, since division with 0 is not allowed.
+Division and Multiplication are quite similar. The optimization we have done is:\\
+\begin{center}
+$0 \cdot x = 0$\\
+$0/x = 0$\\
+$1 \cdot x = x$
+\begin{center}
+These have been implemented in the following way:
 \begin{verbatim}
-in case (e1', e2') of
-       (Constant (IntVal x, _), Constant (IntVal y, _)) =>
-       Constant (IntVal (x*y), pos)
-     | (Constant (IntVal 0, _), _) =>
-       Constant (IntVal 0, pos)
-     | (_, Constant (IntVal 0, _)) =>
-       Constant (IntVal 0, pos)
-     | (_, Constant (IntVal 1, _)) => e1'
-     | (Constant (IntVal 1, _), _) => e2'
-     | _ => Times (e1', e2', pos)
+| Times (e1, e2, pos) =>
+  let val e1' = copyConstPropFoldExp vtable e1
+      val e2' = copyConstPropFoldExp vtable e2
+  in case (e1', e2') of
+         (Constant (IntVal x, _), Constant (IntVal y, _)) =>
+         Constant (IntVal (x*y), pos)
+       | (Constant (IntVal 0, _), _) =>
+         Constant (IntVal 0, pos)
+       | (_, Constant (IntVal 0, _)) =>
+         Constant (IntVal 0, pos)
+       | (_, Constant (IntVal 1, _)) => e1'
+       | (Constant (IntVal 1, _), _) => e2'
+       | _ => Times (e1', e2', pos)
+  end
+| Divide (e1, e2, pos) =>
+  let val e1' = copyConstPropFoldExp vtable e1
+      val e2' = copyConstPropFoldExp vtable e2
+  in case (e1', e2') of
+       | (Constant (IntVal x, _), Constant (IntVal y, _)) => 
+         Constant (IntVal (Int.quot(x,y)), pos)
+
+       | (Constant (IntVal 0, _),          _            ) => 
+         Constant (IntVal 0, pos)
+         
+       | _                                                => 
+         Divide (e1', e2', pos)
+  end
 \end{verbatim}
-In the example shown above (which is taken from multiplication) we can see that when a 0 occurs in as one of our expressions, we simply return 0. The same is done in division, except it returns and error.
+
 \subsection{Negate and Not}
+In the cases of negate and not, they are quite similar, like division and multiplication. The optimization we have done is:\\
+\begin{center}
+not not b = b\\
+~~x = x \\
+~0 = 0
+\end{center}
+These have been implemented in the following way:
+\begin{verbatim}
+| Negate (e1, pos) =>
+  let
+    val e1' = copyConstPropFoldExp vtable e1
+  in
+    case e1' of
+        Constant (IntVal 0, _) => Constant (IntVal 0, pos)
+      | Constant (IntVal x, _) => Constant (IntVal (0-x), pos)
+      | Negate (e, _)          => e
+      | _                      => Negate (e1', pos)
+  end 
+| Not (e1, pos) =>
+  let
+    val e1' = copyConstPropFoldExp vtable e1
+  in
+    case e1' of
+        Constant (BoolVal true, _)  => Constant (BoolVal false, pos)
+      | Constant (BoolVal false, _) => Constant (BoolVal true, pos) 
+      | Not(e, _)                   => e
+      | _                           => Not (e1', pos)
+  end 
+\end{verbatim}
+
+\subsection{And and Or}
+Ïn the cases of And and Or, we have done some optimization. The optimization we have done is:
+\begin{center}
+false and _ = false\\
+true or _ = true
+\end{center}
+This have been implemented in the following way:
+\begin{verbatim}
+| And (e1, e2, pos) =>
+  let val e1' = copyConstPropFoldExp vtable e1
+      val e2' = copyConstPropFoldExp vtable e2
+  in 
+    case e1' of
+          Constant (BoolVal true, pos)  => 
+              (case e2' of
+                    Constant (BoolVal true, pos)  => Constant (BoolVal true, pos)
+                  | Constant (BoolVal false, pos) => Constant (BoolVal false, pos)
+                  | _                             => And (Constant (BoolVal true, pos), e2', pos)
+              )
+        | Constant (BoolVal false, pos) => Constant(BoolVal false, pos)
+        | _                             => And (e1', e2', pos)
+  end
+| Or (e1, e2, pos) =>
+  let val e1' = copyConstPropFoldExp vtable e1
+      val e2' = copyConstPropFoldExp vtable e2
+  in 
+    case e1' of
+          Constant (BoolVal false, pos)  => 
+              (case e2' of
+                    Constant (BoolVal true, pos)  => Constant (BoolVal true, pos)
+                  | Constant (BoolVal false, pos) => Constant (BoolVal false, pos)
+                  | _                             => Or (Constant (BoolVal false, pos), e2', pos)
+              )
+        | Constant (BoolVal true, pos) => Constant(BoolVal true, pos)
+        | _                             => Or (e1', e2', pos)
+  end
+\end{verbatim}
+
 \section{Tests}
 In this following section we will show relevant tests to prove the correctness of our implementations across the Fasto language.\\
 Apart from the gives tests we received with the Fasto folder (which all work and run correctly), we have implemented a few of our own to test some of the important extensions we have made.
