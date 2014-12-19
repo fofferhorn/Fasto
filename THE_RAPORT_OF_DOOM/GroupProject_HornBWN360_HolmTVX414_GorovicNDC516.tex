@@ -84,8 +84,105 @@ After the parser and lexer have been implemented and told how to handle the toke
 The interesting part of these implementations are the inclusion of vtab and ftab. What this basically does is making our code dynamic, in the sense that we are able to look up our previously used functions and variables.\\
 Other than these "simple" implementations, we also implemented the anonymous function (commonly known as Lambda), but we will get back to this later.
 \section{Typechecking}
-After we have told our
-\pagebreak
+The typechecker was implemented with Multiplication, division, boolean operators and literals. We took a copy of plus to create Times, divide and negate only to change the name in plus. In not, and and or we also took a copy of plus, but we also changed the returned variable to bool instead of int. True and false only validate the bool (true/false).
+\begin{verbatim}
+| In.Times (e1, e2, pos)
+  => let val (_, e1_dec, e2_dec) = checkBinOp ftab vtab (pos, Int, e1, e2)
+     in (Int,
+         Out.Times (e1_dec, e2_dec, pos))
+     end
+| In.Divide (e1, e2, pos)
+  => let val (_, e1_dec, e2_dec) = checkBinOp ftab vtab (pos, Int, e1, e2)
+     in (Int,
+         Out.Divide (e1_dec, e2_dec, pos))
+     end
+| In.Negate(e, pos)
+  => let val (_, e1_dec, e2_dec) = checkBinOp ftab vtab (pos, Int, e, e)
+     in (Int,
+         Out.Negate (e1_dec, pos))
+     end
+| In.Not(e, pos)
+  => let val (_, e1_dec, e2_dec) = checkBinOp ftab vtab (pos, Bool, e, e)
+     in (Bool,
+         Out.Not (e1_dec, pos))
+     end
+| In.And(e1, e2, pos)
+  => let val (_, e1_dec, e2_dec) = checkBinOp ftab vtab (pos, Bool, e1, e2)
+     in (Bool,
+         Out.And (e1_dec, e2_dec, pos))
+     end
+| In.Or(e1, e2, pos)
+  => let val (_, e1_dec, e2_dec) = checkBinOp ftab vtab (pos, Bool, e1, e2)
+     in (Bool,
+         Out.Or (e1_dec, e2_dec, pos))
+     end
+| In.True(pos)
+  => (Bool, Out.True(pos))
+| In.False(pos)
+  => (Bool, Out.False(pos))
+\end{verbatim}
+
+Filter and scan and was also implemented in the typechecker.We used code from reduce to complete filter in the typechecker. Reduce have the same parameter and where very similar to scan, so we only change the name from reduce to scan, and a elem_type to arr_type to finish scan.
+
+\begin{verbatim}
+| In.Scan (f, n_exp, arr_exp, _, pos) =>
+    let 
+      val (n_type, n_dec) = checkExp ftab vtab n_exp
+      val (arr_type, arr_dec) = checkExp ftab vtab arr_exp
+      val elem_type =
+        case arr_type of
+            Array t => t
+          | other => raise Error ("Scan: Argument not an array", pos)
+      val (f', f_arg_type) =
+        case checkFunArg (f, vtab, ftab, pos) of
+            (f', res, [a1, a2]) =>
+            if a1 = a2 andalso a2 = res
+            then (f', res)
+            else raise Error
+                   ("Scan: incompatible function type of "
+                    ^ In.ppFunArg 0 f ^": " ^ showFunType ([a1, a2], res), pos)
+          | (_, res, args) =>
+            raise Error ("Scan: incompatible function type of "
+                         ^ In.ppFunArg 0 f ^ ": " ^ showFunType (args, res), pos)
+      fun err (s, t) =
+          Error ("Scan: unexpected " ^ s ^ " type " ^ ppType t ^
+                 ", expected " ^ ppType f_arg_type, pos)
+  in if elem_type = f_arg_type
+     then if elem_type = n_type
+          then (arr_type,
+                Out.Scan (f', n_dec, arr_dec, elem_type, pos))
+          else raise (err ("neutral element", n_type))
+     else raise err ("array element", elem_type)
+  end
+\end{verbatim}
+To create filter we took a copy of map and change map to filter. We removed one parameter from map to filter, because filter cannot change the return type. We also changed filter to return a bool as its result.
+
+\begin{verbatim}
+| In.Filter (f, arr_exp, _, pos) => 
+    let 
+      val (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
+      val elem_type =
+          case arr_type of
+               Array t => t
+             | other   => raise Error ("Filter: Argument not an array", pos)
+      val (f', f_res_type, f_arg_type) =
+          case checkFunArg (f, vtab, ftab, pos) of
+               (f', Bool, [a1]) => (f', Bool, a1)
+             | (f',  res, args) =>
+               raise Error ("Filter: function does not return type Bool: " 
+                            ^ In.ppFunArg 0 f ^ ":" ^ showFunType (args, res), pos)
+             | (_,  res, args)  =>
+               raise Error ("Filter: incompatible function type of "
+                            ^ In.ppFunArg 0 f ^ ":" ^ showFunType (args, res), pos)
+    in if elem_type = f_arg_type
+       then (arr_type,
+             Out.Filter (f', arr_exp_dec, elem_type, pos))
+       else raise Error ("Filter: array element types does not match. "
+                         ^ ppType elem_type ^ " instead of "
+                         ^ ppType f_arg_type , pos)
+    end
+\end{verbatim}
+
 \section{CodeGen}
 Inside the codegen file we were given a few already working functions which translated into MIPS code without a problem, such as Plus, Minus and map. We have extended the simple math expressions within CodeGen to include Not, Negate, And, Or, Times and Divide. All of which have been tested and worked without any difficulties. All of these functions were relatively simple to implement, since Divide and Times are alike, Not and Negate are alike and so on.\\\\
 The real challenge came when trying to implement the Scan and Filter functions. We knew from previous lectures and individual assignments, that Filter is similar to Map, and Scan is similar to Reduce. This helped us in the sense that we could "borrow" some of the code from the two functions Map and Reduce and adjust them.
@@ -220,7 +317,7 @@ This have been implemented in the following way:
 
 \section{Tests}
 In this following section we will show relevant tests to prove the correctness of our implementations across the Fasto language.\\
-Apart from the gives tests we received with the Fasto folder (which all work and run correctly), we have implemented a few of our own to test some of the important extensions we have made.
+Apart from the given tests we received with the Fasto folder (which all work and run correctly), we have implemented a few of our own to test some of the important extensions we have made.
 \subsection{Precedence}
 To test that our precedence of expressions are correct we have used the following program;
 \begin{verbatim}
@@ -239,7 +336,7 @@ To test that our And/Or expressions are handled correctly we have used the follo
 fun bool main() =
 write(true && true || false)
 \end{verbatim}
-The program returns "True" which is what we expect and want from it. If we choose to remove the and expression and do "write(true || false)" it will return false, which shows that both are expressions are working as intended.
+The program returns "True" which is what we expect and want from it. If we choose to remove the and expression and do "write(true || false)" it will return false, which shows that both expressions are working as intended.
 \subsection{Not}
 The program we use to test out "not" expressions looks like this;
 \begin{verbatim}
@@ -254,8 +351,8 @@ fun bool main() =
     write(not 3)
 \end{verbatim}
 This program returns "Type error: Cannot unify types bool and int at line 2 column 11", which is what we want.
-\subsection{Redundant testing}
-This section will cover some of the more redundant test we have made to make sure that our implementations are correct. These tests will include a "double negate" and a "double not" function. Below can be seen an example of how we have made sure, that we can use double not or double negate expressions;
+\subsection{Optimization testing}
+This section will cover the optimization we have made to make sure that our implementations are correct. These tests will include a "double negate" and a "double not" function. Below you can be seen an example of how we have made sure, that double not and negate expressions are optimized correctly:
 \begin{verbatim}
 fun bool main() =
     write(not not true)
